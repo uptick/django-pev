@@ -40,9 +40,11 @@ class Explain:
                 sql = f"EXPLAIN (VERBOSE, FORMAT JSON) {self.sql}"
             cursor.execute(sql)
             plan = cursor.fetchone()[0]
-        return upload_sql_plan(query=self.sql if upload_query else "", plan=plan, title=title)
+        response = upload_sql_plan(query=self.sql if upload_query else "", plan=plan, title=title)
+        logging.info(f"View Postgresql Explain @ {response.url}")
+        return response
 
-    def explain(self, analyze: bool = True, title="") -> None:
+    def explain(self, analyze: bool = True) -> str:
         with connections[self.db_alias].cursor() as cursor:
             if analyze:
                 sql = f"EXPLAIN ANALYZE {self.sql}"
@@ -50,7 +52,7 @@ class Explain:
                 sql = f"EXPLAIN {self.sql}"
             cursor.execute(sql)
             explain = cursor.fetchone()[0]
-        print(explain)
+        return explain
 
 
 @dataclass
