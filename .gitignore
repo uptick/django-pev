@@ -98,3 +98,4 @@ playwright-report/
 coverage.json
 .coverage*
 htmlcov/
+.cache
