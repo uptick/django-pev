@@ -1,1 +1,1 @@
-from .utils import explain
+from .utils import explain  # NOQA

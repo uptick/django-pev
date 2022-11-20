@@ -2,7 +2,6 @@ import logging
 import traceback
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Optional
 
 from django.core.signals import request_started
 from django.db import connections, reset_queries
@@ -75,7 +74,7 @@ class ExplainSet:
 
 @contextmanager
 def explain(
-    db_alias: Optional[str] = "default",
+    db_alias: str = "default",
     trace_limit: int = 10,
 ):
     """Capture all queries within this context and returns an ExplainSet container.

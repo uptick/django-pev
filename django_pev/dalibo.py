@@ -1,5 +1,6 @@
 import json
 import urllib
+import urllib.request
 from dataclasses import dataclass
 
 API_URL = "https://explain.dalibo.com/new.json"
