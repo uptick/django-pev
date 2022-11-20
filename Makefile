@@ -24,5 +24,8 @@ test: postgres
 	@echo "--- 💃 Testing 💃 ---"
 	poetry run python manage.py test
 
+publish:ci
+	poetry run --publish
+
 ci: test lint
 
