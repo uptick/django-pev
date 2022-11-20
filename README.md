@@ -1,12 +1,15 @@
-# DJDT-PEV2 (Django Debug Toolbar - Postgres explain visualizer 2)
+# Django Postgres Explain Visualizer (Django-PEV)
 
 [![PyPI version](https://badge.fury.io/py/django-pev.svg)](https://pypi.org/project/django-pev/)
 [![versions](https://img.shields.io/pypi/pyversions/django-pev.svg)](https://pypi.org/project/django-pev/)
-[![Lint](https://github.com/uptick/django-pev/actions/workflows/ci.yml/badge.svg)](https://github.com/uptick/djdt-pev2/actions/workflows/ci.yml)
+[![Lint](https://github.com/uptick/django-pev/actions/workflows/ci.yaml/badge.svg)](https://github.com/uptick/django-pev/actions/workflows/ci.yaml)
 
-This tool captures sql queries within the context and provides an easy interface to generate and utilize a postgresql explain visualizer (PEV) by [dalibo](https://explain.dalibo.com/).
+This tool captures sql queries and uploads the query plan to postgresql explain visualizer (PEV) by [dalibo](https://explain.dalibo.com/). This is especially helpful for debugging slow queries.
 
 # Usage
+
+Wrap some code with the explain context manager. All sql queries are captured
+alongside a stacktrace (to locate where it was called). The slowest query is accessible via `.slowest`.
 
 ```python
 import django_pev
@@ -20,13 +23,32 @@ with django_pev.explain(
     list(User.objects.filter(some__long__join=1).all())
 
 # Rerun the slowest query with `EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON)`
-# And upload the results to https://explain.dalibo.com
+# And uploads the query plan to https://explain.dalibo.com
 pev_response = e.slowest.visualize()
+
+# View the visualization
 print(pev_response.url)
 
 
 # Delete the plan hosted on https://explain.dalibo.com
 pev_response.delete()
+```
+
+**Debugging a slow endpoint**
+
+```python
+import django_pev
+
+from django.test import Client as TestClient
+
+client = TestClient()
+
+with django_pev.explain() as e:
+    url = "/some_slow_url"
+    response = client.get(url)
+
+print(e.slowest.visualize())
+
 ```
 
 # Disclaimer
