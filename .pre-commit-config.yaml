@@ -6,27 +6,21 @@ repos:
         args:
           - --all
   - repo: https://github.com/psf/black
-    rev:  22.10.0
+    rev: 22.10.0
     hooks:
       - id: black
   - repo: https://github.com/PyCQA/isort
-    rev:  5.10.1
+    rev: 5.10.1
     hooks:
       - id: isort
   - repo: https://github.com/PyCQA/flake8
-    rev:  5.0.4
+    rev: 5.0.4
     hooks:
       - id: flake8
         additional_dependencies:
           - flake8-blind-except
           - flake8-bugbear
           - flake8-comprehensions
-          - flake8-debugger
-          - flake8-isort
-          - flake8-polyfill
-          - flake8-pytest
-          - flake8-typing-imports
-          - yesqa
   - repo: local
     hooks:
       - id: poetry run mypy
@@ -39,8 +33,18 @@ repos:
         language: python
 
   - repo: https://github.com/commitizen-tools/commitizen
-    rev:  v2.37.0
+    rev: v2.37.0
     hooks:
       - id: commitizen
         stages:
           - commit-msg
+  - repo: local
+    hooks:
+      - id: mypy
+        args:
+          - --show-error-codes
+        name: mypy
+        files: ^.*\.(py)$
+        entry: poetry run mypy
+        require_serial: true
+        language: python
