@@ -33,6 +33,7 @@ repos:
         args:
           - --show-error-codes
         name: mypy
+        files: ^.*\.(py)$
         entry: mypy
         require_serial: true
         language: python
