@@ -1,0 +1,100 @@
+# Project ignored local folders
+playwright_traces/
+ci_reports
+abas/static/
+webpack-stats.json
+esbuild_metadata.json
+explain.py
+var
+abas/settings/local.py
+secret.env
+.env
+.aws_credentials
+.python-version
+.build.sha
+
+# Built JS / CSS files
+abas/apps/core/static/css/master*.css
+abas/apps/core/static/css/print*.css
+dist/
+frontend/**/dist
+
+# Coverage
+coverage
+.coverage
+coverage.xml
+htmlcov
+
+# Mac stuff
+.DS_Store
+
+# Unix stuff
+*.sw*
+
+# Typescript stuff
+tsconfig.tsbuildinfo
+
+# Eslint stuff
+.eslintcache
+
+# Python temporary files
+*__pycache__/
+*.pyc
+.mypy_cache/
+
+# Various Logs
+debug.log
+ghostdriver.log
+import.log
+
+# Frontend temporary files
+node_modules
+.module-cache
+.sass-cache/
+
+
+# npm log
+npm-debug.log*
+
+# yarn log
+yarn-error.log
+
+# Emacs temporary files
+**~
+
+# Sublime editor
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# VS Code editor
+.vscode/
+
+# Intellij IDEA and Pycharm per-user project settings
+.idea/
+
+# Docker
+shared.local.env
+
+# Jupyter
+*.ipynb
+.ipynb_checkpoints
+notebooks
+.prettierrc.json
+
+functiontrace*
+
+# dmypy
+.dmypy.json
+
+# React Cosmos
+cosmos.userdeps.js
+
+# Ignore e2e playwrightoutput
+test-results/
+playwright-report/
+
+# coverage
+coverage.json
+.coverage*
+htmlcov/

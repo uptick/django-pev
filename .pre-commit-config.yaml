@@ -1,0 +1,40 @@
+repos:
+  - repo: https://github.com/hadialqattan/pycln
+    rev: v2.1.1
+    hooks:
+      - id: pycln
+        args:
+          - --all
+  - repo: https://github.com/psf/black
+    hooks:
+      - id: black
+  - repo: https://github.com/PyCQA/isort
+    hooks:
+      - id: isort
+  - repo: https://github.com/PyCQA/flake8
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-blind-except
+          - flake8-bugbear
+          - flake8-comprehensions
+          - flake8-debugger
+          - flake8-isort
+          - flake8-polyfill
+          - flake8-pytest
+          - flake8-typing-imports
+          - yesqa
+  - repo: local
+    hooks:
+      - id: mypy
+        args:
+          - --show-error-codes
+        name: mypy
+        entry: mypy
+        require_serial: true
+        language: python
+  - repo: https://github.com/commitizen-tools/commitizen
+    hooks:
+      - id: commitizen
+        stages:
+          - commit-msg
