@@ -15,19 +15,20 @@ alongside a stacktrace (to locate where it was called). The slowest query is acc
 import django_pev
 
 with django_pev.explain(
-    # By default the text of the query is not uploaded for security reasons
-    upload_query=True,
     title="Analyzing slow User join"
 ) as e:
     # Every SQL query is captured
     list(User.objects.filter(some__long__join=1).all())
 
 # Rerun the slowest query with `EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON)`
-# And uploads the query plan to https://explain.dalibo.com
-pev_response = e.slowest.visualize()
+pev_response = e.slowest.visualize(
+    # By default the text of the query is not uploaded for security reasons
+    upload_query=True,
+)
+print(pev_response.url)
 
 # View the visualization
-print(pev_response.url)
+e.slowest.visualize_in_browser()
 
 
 # Delete the plan hosted on https://explain.dalibo.com
