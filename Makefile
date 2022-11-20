@@ -18,7 +18,7 @@ lint: isort flake8 black mypy
 
 postgres:
 	docker-compose up -d
-	until psql postgres://postgres@localhost:5432/example -c 'select 1'; do sleep 2; done
+	until psql postgres://postgres@localhost:5435/example -c 'select 1'; do sleep 2; done
 
 test: postgres
 	@echo "--- 💃 Testing 💃 ---"

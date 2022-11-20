@@ -1,5 +1,7 @@
+import functools
 import logging
 import traceback
+import webbrowser
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 
@@ -12,7 +14,7 @@ from django_pev.exceptions import PevException
 logger = logging.Logger("django_pev")
 
 
-@dataclass
+@dataclass(frozen=True)
 class Explain:
     index: int
     duration: float
@@ -26,6 +28,7 @@ class Explain:
     def __str__(self) -> str:
         return f"Explain(duration={self.duration} sql={self.sql[:20]})"
 
+    @functools.cache  # noqa
     def visualize(self, upload_query: bool = False, analyze: bool = True, title: str = "") -> PevResponse:
         """Uploads the query and plan to explain.dalibo
 
@@ -42,6 +45,12 @@ class Explain:
             plan = cursor.fetchone()[0]
         response = upload_sql_plan(query=self.sql if upload_query else "", plan=plan, title=title)
         logging.info(f"View Postgresql Explain @ {response.url}")
+        return response
+
+    def visualize_in_browser(self, upload_query: bool = False, analyze: bool = True, title: str = "") -> PevResponse:
+        """Uploads the query and plan t oexplain.dalibo and then open in the browser"""
+        response = self.visualize(upload_query, analyze, title)
+        webbrowser.open(response.url)
         return response
 
     def explain(self, analyze: bool = True) -> str:

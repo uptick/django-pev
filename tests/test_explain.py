@@ -37,3 +37,12 @@ class TestExplain(TestCase):
 
         # We can delete the results
         pev_result.delete()
+
+    def test_open_visualization_in_browser(self):
+        # We can upload results to dalibo
+        with explain() as e:
+            list(Student.objects.filter(name="1"))
+
+        pev_result = e.slowest.visualize_in_browser()
+
+        pev_result.delete()
