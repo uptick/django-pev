@@ -16,9 +16,13 @@ mypy:
 
 lint: isort flake8 black mypy
 
-test:
+postgres:
+	docker-compose up -d
+	until psql postgres://postgres@localhost:5432/example -c 'select 1'; do sleep 2; done
+
+test: postgres
 	@echo "--- 💃 Testing 💃 ---"
-	python manage.py test
+	poetry run python manage.py test
 
 ci: test lint
 

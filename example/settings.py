@@ -74,7 +74,14 @@ WSGI_APPLICATION = "example.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {"default": {"NAME": "example", "ENGINE": "django.db.backends.postgresql"}}
+DATABASES = {
+    "default": {
+        "NAME": "example",
+        "HOST": "localhost",
+        "USER": "postgres",
+        "ENGINE": "django.db.backends.postgresql",
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
