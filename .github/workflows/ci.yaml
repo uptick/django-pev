@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   ci:
-    uses: uptick/actions/.github/workflows/ci.yaml@main
+    uses: uptick/actions/.github/workflows/ci.yaml@release/slack-error
     secrets: inherit
     with:
       aws: true

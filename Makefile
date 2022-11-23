@@ -1,5 +1,6 @@
 isort:
 	@echo "--- 🐍 Isorting 🐍 ---"
+	asdlkjaslkdj
 	poetry run isort example test django_pev
 
 flake8:
