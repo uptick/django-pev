@@ -13,42 +13,53 @@ alongside a stacktrace (to locate where it was called). The slowest query is acc
 
 ```python
 import django_pev
+from django.contrib.auth.models import User
 
-with django_pev.explain(
-    title="Analyzing slow User join"
-) as e:
+with django_pev.explain() as e:
     # Every SQL query is captured
-    list(User.objects.filter(some__long__join=1).all())
+    list(User.objects.filter(email='test@test.com').all())
 
 # Rerun the slowest query with `EXPLAIN (ANALYZE, COSTS, VERBOSE, BUFFERS, FORMAT JSON)`
 pev_response = e.slowest.visualize(
     # By default the text of the query is not uploaded for security reasons
     upload_query=True,
+    # Set to false if the query is slow and you want only an explain
+    analyze=True,
+    # Give a helpful title for the uploaded query plan
+    title="Measuring email filter",
 )
 print(pev_response.url)
 
-# View the visualization
+# View the postgres explain visualization
 e.slowest.visualize_in_browser()
 
+# View the stack trace of the slowest query
+print(e.slowest.stacktrace)
 
 # Delete the plan hosted on https://explain.dalibo.com
 pev_response.delete()
 ```
 
-**Debugging a slow endpoint**
+**How to debug a slow endpoint in production**
+
+If you have access to `python manage.py shell` on the production server;
+you can run the following code snippet to get an explain plan uploaded. In general this technique is all types of profiling.
 
 ```python
 import django_pev
 
+from django.contrib.auth.models import User
 from django.test import Client as TestClient
 
 client = TestClient()
+# Authentication
+client.force_login(User.objects.get(id=1))
+url = "/some_slow_url"
 
 with django_pev.explain() as e:
-    url = "/some_slow_url"
     response = client.get(url)
 
-print(e.slowest.visualize())
+print(e.slowest.visualize(title=f"Fetching {url}"))
 
 ```
 
