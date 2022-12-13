@@ -8,6 +8,8 @@ from dataclasses import dataclass, field
 from django.core.signals import request_started
 from django.db import connections, reset_queries
 
+import sqlparse  # type:ignore[import]
+
 from django_pev.dalibo import PevResponse, upload_sql_plan
 from django_pev.exceptions import PevException
 
@@ -122,7 +124,7 @@ def explain(
             Explain(
                 index=index,
                 duration=float(q["time"]),
-                sql=q["sql"],
+                sql=sqlparse.format(q["sql"], reindent=True, keyword_case="upper"),
                 stack_trace="".join(traceback.format_stack()[-trace_limit:-2]),
                 db_alias=db_alias,
             )
