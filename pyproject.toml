@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-pev"
-version = "0.1.1"
+version = "0.1.2"
 description = "Context manager to upload explain plans to https://explain.dalibo.com/"
 authors = ["william chu <william.chu@uptickhq.com>"]
 readme = "README.md"
