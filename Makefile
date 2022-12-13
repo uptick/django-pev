@@ -25,7 +25,7 @@ test: postgres
 	poetry run python manage.py test
 
 publish:ci
-	poetry run --publish
+	poetry publish --build
 
 ci: test lint
 
