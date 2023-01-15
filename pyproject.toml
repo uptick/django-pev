@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-pev"
-version = "0.1.2"
+version = "0.1.4"
 description = "Context manager to upload explain plans to https://explain.dalibo.com/"
 authors = ["william chu <william.chu@uptickhq.com>"]
 readme = "README.md"
@@ -9,7 +9,7 @@ packages = [{ include = "django_pev" }]
 [tool.poetry.dependencies]
 python = "^3.7"
 sqlparse = "*"
-django = "^3.2"
+django = ">=3.2, <5.0.0"
 
 [tool.poetry.group.dev.dependencies]
 psycopg2 = "^2.9.5"
