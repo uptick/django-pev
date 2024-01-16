@@ -1,0 +1,49 @@
+{% extends "django_pev/base.html" %}
+{% block content %}
+<div class="row">
+    <div class="card mb-4 mt-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h4 class="card-title mb-0">Maintenance Stats</h4>
+                </div>
+            </div>
+            <table id="maintenance-table" class="table">
+                <thead>
+                    <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Schema</th>
+                    <th scope="col">Last Vacuum</th>
+                    <th scope="col">Last Auto Vacuum</th>
+                    <th scope="col">Last Analyze</th>
+                    <th scope="col">Last Auto Analyze</th>
+                    <th scope="col">Dead Rows</th>
+                    <th scope="col">Live Rows</th>
+                    <th scope="col">Index Hit Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in tables %}
+                    <tr id="#{{row.name}}">
+                        <td>{{ row.name }}
+                            {% if row.requires_index %}<span class="badge text-bg-warning">Requires Index</span> {% endif %}
+                        </td>
+                        <td>{{ row.schema }}</td>
+                        <td>{{ row.last_vacuum | timesince }}</td>
+                        <td>{{ row.last_autovacuum | timesince }}</td>
+                        <td>{{ row.last_analyze | timesince }}</td>
+                        <td>{{ row.last_autoanalyze | timesince }}</td>
+                        <td>{{ row.dead_rows }}</td>
+                        <td>{{ row.live_rows }}</td>
+                        <td>{{ row.index_hit_rate_formatted }}</td>
+                    </tr>
+                    {% endfor%}
+                </tbody>
+            </table>
+
+        </div>
+        <div class="card-footer">
+        </div>
+    </div>
+</div>
+{% endblock %}

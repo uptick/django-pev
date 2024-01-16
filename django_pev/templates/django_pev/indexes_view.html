@@ -1,0 +1,165 @@
+{% extends "django_pev/base.html" %}
+{% block content %}
+<div class="row">
+    <div class="card mb-4 mt-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h4 class="card-title mb-0">Index Stats</h4>
+                </div>
+            </div>
+
+        <div class="card mt-4">
+            <div class="row row-cols-1 row-cols-md-3 text-center">
+                <div class="col mb-sm-4 mb-0">
+                    <div class="text-medium-emphasis">Index Hit Rate</div>
+                    <div class="fw-semibold">How often we are hitting index vs full table scan.</div>
+                    <div class="fw-semibold">{{ total_index_hitrate |floatformat:2 }}%</div>
+                    <div class="fw-semibold"> </div>
+                    <div class="progress progress-thin mt-2">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{total_index_hitrate}}%" aria-valuenow="{{total_index_hitrate}}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                <div class="col mb-sm-4 mb-0">
+                    <div class="text-medium-emphasis">Duplicated Indexes</div>
+                    <div class="fw-semibold">{{ count_duplicated_indexes }} Indexes covered by other indexes</div>
+                    <div class="fw-semibold">{{ total_duplicated_indexes_size | filesizeformat}} ({{percent_duplicated_indexes |floatformat:2}}%)</div>
+                    <div class="progress progress-thin mt-2">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: {{percent_duplicated_indexes}}%" aria-valuenow="{{percent_duplicated_indexes}}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+                <div class="col mb-sm-4 mb-0">
+                    <div class="text-medium-emphasis">Unused Indexes</div>
+                    <div class="fw-semibold"> {{count_unused_indexes}} indexes not used enough to justify </div>
+                    <div class="fw-semibold"> {{total_unused_indexes_size |filesizeformat}} ({{percent_unused_indexes |floatformat:2}}%)</div>
+                    <div class="progress progress-thin mt-2">
+                        <div class="progress-bar bg-warning" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <nav>
+            <div class="nav nav-tabs mt-4" id="nav-tab" role="tablist">
+                <button class="nav-link active" id="nav-unused-tab" data-coreui-toggle="tab" data-coreui-target="#nav-unused" type="button" role="tab" aria-controls="nav-unused" aria-selected="true">Unused Indexes</button>
+                <button class="nav-link" id="nav-duplicated-tab" data-coreui-toggle="tab" data-coreui-target="#nav-duplicated" type="button" role="tab" aria-controls="nav-duplicated" aria-selected="false">Duplicated Indexes</button>
+                <button class="nav-link" id="nav-all-tab" data-coreui-toggle="tab" data-coreui-target="#nav-all" type="button" role="tab" aria-controls="nav-all" aria-selected="false">All</button>
+            </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="nav-unused" role="tabpanel" aria-labelledby="nav-unused-tab" tabindex="0">
+                <table  class="table">
+                    <thead>
+                        <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Columns</th>
+                        <th scope="col">Size</th>
+                        <th scope="col">Hit Rate</th>
+                        <th scope="col">Index Scans</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in unused_indexes %}
+                        <tr id="#{{row.name}}">
+                            <td>{{ row.name }}
+                                {% if row.is_unused %}
+                                <span class="badge text-bg-warning">Unused</span>
+                                {% endif %}
+                                {% if row.is_duplicated%}
+                                <span class="badge text-bg-danger">Duplicated</span>
+                                {% endif %}
+                                <br>
+                                <small>
+                                {{row.definition}}
+                                </small>
+                            </td>
+                            <td>{{ row.columns_formatted }}</td>
+                            <td>{{ row.size_bytes | filesizeformat}}</td>
+                            <td>{{ row.hit_rate }}</td>
+                            <td>{{ row.index_scans }}</td>
+                        </tr>
+                        {% endfor%}
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane fade " id="nav-duplicated" role="tabpanel" aria-labelledby="nav-duplicated-tab" tabindex="0">
+                <table class="table">
+                    <thead>
+                        <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Columns</th>
+                        <th scope="col">Size</th>
+                        <th scope="col">Hit Rate</th>
+                        <th scope="col">Index Scans</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in duplicated_indexes %}
+                        <tr id="#{{row.name}}">
+                            <td>{{ row.name }}
+                                {% if row.is_unused %}
+                                <span class="badge text-bg-warning">Unused</span>
+                                {% endif %}
+                                {% if row.is_duplicated%}
+                                <span class="badge text-bg-danger">Duplicated</span>
+                                {% endif %}
+                                <br>
+                                <small>
+                                {{row.definition}}
+                                </small>
+                                <br>
+                                Covered by:
+                                <br>
+                                <small>
+                                {{row.covered_by.definition}}
+                                </small>
+                            </td>
+                            <td>{{ row.columns_formatted }}</td>
+                            <td>{{ row.size_bytes | filesizeformat}}</td>
+                            <td>{{ row.hit_rate }}</td>
+                            <td>{{ row.index_scans }}</td>
+                        </tr>
+                        {% endfor%}
+                    </tbody>
+                </table>
+            </div>
+            <div class="tab-pane fade " id="nav-all" role="tabpanel" aria-labelledby="nav-all-tab" tabindex="0">
+                <table class="table">
+                    <thead>
+                        <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Columns</th>
+                        <th scope="col">Size</th>
+                        <th scope="col">Hit Rate</th>
+                        <th scope="col">Index Scans</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in all_indexes %}
+                        <tr id="#{{row.name}}">
+                            <td>{{ row.name }}
+                                {% if row.is_unused %}
+                                <span class="badge text-bg-warning">Unused</span>
+                                {% endif %}
+                                {% if row.is_duplicated%}
+                                <span class="badge text-bg-danger">Duplicated</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ row.columns_formatted }}</td>
+                            <td>{{ row.size_bytes | filesizeformat}}</td>
+                            <td>{{ row.hit_rate }}</td>
+                            <td>{{ row.index_scans }}</td>
+                        </tr>
+                        {% endfor%}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        </div>
+        <div class="card-footer">
+        </div>
+    </div>
+</div>
+{% endblock %}
