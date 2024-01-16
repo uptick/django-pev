@@ -15,6 +15,7 @@ def index(request):
 
 class BaseView(UserPassesTestMixin, TemplateView):
     template_name = "django_pev/indexes_view.html"
+
     def test_func(self):
         return self.request.user.is_superuser
 

@@ -40,9 +40,7 @@ class Migration(migrations.Migration):
                 ("name", models.TextField()),
                 (
                     "teacher",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="school.teacher"
-                    ),
+                    models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="school.teacher"),
                 ),
             ],
         ),

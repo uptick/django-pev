@@ -101,11 +101,7 @@ def get_index_stats(indexes: list[IndexInfo] | None = None) -> dict:
         "count_unused_indexes": sum(1 for i in indexes if i.is_unused),
     }
 
-    ret["percent_duplicated_indexes"] = (
-        float(ret["total_duplicated_indexes_size"]) / ret["total_indexes_size"] * 100
-    )  # type:ignore
-    ret["percent_unused_indexes"] = (
-        float(ret["total_unused_indexes_size"]) / ret["total_indexes_size"] * 100
-    )  # type:ignore
+    ret["percent_duplicated_indexes"] = float(ret["total_duplicated_indexes_size"]) / ret["total_indexes_size"] * 100  # type:ignore
+    ret["percent_unused_indexes"] = float(ret["total_unused_indexes_size"]) / ret["total_indexes_size"] * 100  # type:ignore
 
     return ret
