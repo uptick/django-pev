@@ -16,6 +16,7 @@ class BaseView(TemplateView):
     template_name = "django_pev/indexes_view.html"
     pass
 
+
 class SpaceView(BaseView):
     template_name = "django_pev/space.html"
 
@@ -51,38 +52,45 @@ class IndexesView(BaseView):
         all_indexes = indexes.get_indexes()
         ctx["all_indexes"] = all_indexes
         ctx["unused_indexes"] = sorted(
-            [i for i in all_indexes if i.is_unused], key=lambda i: i.size_bytes, reverse=True
+            [i for i in all_indexes if i.is_unused],
+            key=lambda i: i.size_bytes,
+            reverse=True,
         )
         ctx["duplicated_indexes"] = sorted(
-            [i for i in all_indexes if i.is_duplicated], key=lambda i: i.size_bytes, reverse=True
+            [i for i in all_indexes if i.is_duplicated],
+            key=lambda i: i.size_bytes,
+            reverse=True,
         )
 
         ctx.update(indexes.get_index_stats())
         return ctx
+
 
 class ConnectionsView(BaseView):
     template_name = "django_pev/connections.html"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         ctx = super().get_context_data(**kwargs)
-        ctx['connections'] = live_connections.get_connections_current_database()
+        ctx["connections"] = live_connections.get_connections_current_database()
         return ctx
+
 
 class LiveQueriesView(BaseView):
     template_name = "django_pev/live_queries.html"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         ctx = super().get_context_data(**kwargs)
-        ctx['queries'] = queries.get_live_queries_current_database()
+        ctx["queries"] = queries.get_live_queries_current_database()
         return ctx
+
 
 class QueriesView(BaseView):
     template_name = "django_pev/queries.html"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         ctx = super().get_context_data(**kwargs)
-        ctx['queries'] = queries.get_query_stats()
-        ctx['is_pg_stats_enabled'] = queries.is_pg_stat_statements_installed()
-        ctx['queries_by_io'] = sorted(queries.get_query_stats(), key=lambda i: i.shared_blks_hit, reverse=True)
-        ctx['queries_by_slowest'] = sorted(queries.get_query_stats(), key=lambda i: i.mean_time, reverse=True)
+        ctx["queries"] = queries.get_query_stats()
+        ctx["is_pg_stats_enabled"] = queries.is_pg_stat_statements_installed()
+        ctx["queries_by_io"] = sorted(queries.get_query_stats(), key=lambda i: i.shared_blks_hit, reverse=True)
+        ctx["queries_by_slowest"] = sorted(queries.get_query_stats(), key=lambda i: i.mean_time, reverse=True)
         return ctx

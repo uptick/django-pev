@@ -68,7 +68,9 @@ def get_total_index_hitrate() -> float:
         return cursor.fetchone()[0]
 
 
-def _update_indexes_with_duplicated_indexes(indexes: list[IndexInfo] | None = None) -> None:
+def _update_indexes_with_duplicated_indexes(
+    indexes: list[IndexInfo] | None = None,
+) -> None:
     """Modifies a list of indexes a reference to the other index that covers it"""
     indexes = indexes or get_indexes()
     indexes_by_table = {key: list(group) for key, group in groupby(indexes, lambda i: i.table_key)}

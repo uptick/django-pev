@@ -4,23 +4,24 @@ from datetime import datetime
 from django.db import OperationalError, connection
 
 TIME_DURATION_UNITS = (
-    ('week', 60*60*24*7*1000),
-    ('day', 60*60*24*1000),
-    ('hour', 60*60*1000),
-    ('min', 60*1000),
-    ('sec', 1000),
-    ('ms', 1)
+    ("week", 60 * 60 * 24 * 7 * 1000),
+    ("day", 60 * 60 * 24 * 1000),
+    ("hour", 60 * 60 * 1000),
+    ("min", 60 * 1000),
+    ("sec", 1000),
+    ("ms", 1),
 )
+
 
 def human_time_duration(milliseconds: float) -> str:
     if milliseconds == 0:
-        return 'inf'
+        return "inf"
     parts = []
     for unit, div in TIME_DURATION_UNITS:
         amount, milliseconds = divmod(int(milliseconds), div)
         if amount > 0:
-            parts.append('{} {}'.format(amount, unit))
-    return ' '.join(parts[:2])
+            parts.append("{} {}".format(amount, unit))
+    return " ".join(parts[:2])
 
 
 @dataclasses.dataclass
@@ -76,7 +77,6 @@ COALESCE(query_start, xact_start) DESC
 
 @dataclasses.dataclass
 class QueryStatInfo:
-
     query: str
     query_id: str
     query_md5: str
@@ -128,6 +128,7 @@ def is_pg_stat_statements_installed() -> bool:
 def enable_pg_stat_statements():
     with connection.cursor() as cursor:
         cursor.execute("CREATE EXTENSION IF NOT EXISTS pg_stat_statements")
+
 
 def reset_pg_stat_statements():
     with connection.cursor() as cursor:

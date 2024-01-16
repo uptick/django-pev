@@ -16,23 +16,24 @@ logger = logging.Logger("django_pev")
 
 
 TIME_DURATION_UNITS = (
-    ('week', 60*60*24*7*1000),
-    ('day', 60*60*24*1000),
-    ('hour', 60*60*1000),
-    ('min', 60*1000),
-    ('sec', 1000),
-    ('ms', 1)
+    ("week", 60 * 60 * 24 * 7 * 1000),
+    ("day", 60 * 60 * 24 * 1000),
+    ("hour", 60 * 60 * 1000),
+    ("min", 60 * 1000),
+    ("sec", 1000),
+    ("ms", 1),
 )
+
 
 def human_time_duration(milliseconds: int) -> str:
     if milliseconds == 0:
-        return 'inf'
+        return "inf"
     parts = []
     for unit, div in TIME_DURATION_UNITS:
         amount, milliseconds = divmod(int(milliseconds), div)
         if amount > 0:
-            parts.append('{} {}{}'.format(amount, unit, "" if amount == 1 else "ms"))
-    return ', '.join(parts)
+            parts.append("{} {}{}".format(amount, unit, "" if amount == 1 else "ms"))
+    return ", ".join(parts)
 
 
 @dataclass(frozen=True)
@@ -148,4 +149,3 @@ def explain(
                 db_alias=db_alias,
             )
         )
-

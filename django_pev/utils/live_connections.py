@@ -44,6 +44,6 @@ ORDER BY
     pg_stat_activity.pid
     """
     with connection.cursor() as cursor:
-        database_name = connection.get_connection_params()['database']
+        database_name = connection.get_connection_params()["database"]
         cursor.execute(sql, [database_name])
         return list(ConnectionInfo(*c) for c in cursor.fetchall())
