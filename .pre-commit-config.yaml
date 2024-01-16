@@ -5,23 +5,24 @@ repos:
     hooks:
       # Run the linter.
       - id: ruff
-        args: [ --fix ]
+        args: [--fix]
       # Run the formatter.
       - id: ruff-format
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.13.0
+    hooks:
+      - id: commitizen
+        stages: ["commit-msg"]
+
   - repo: local
     hooks:
-      - id: poetry run mypy
+      - id: mypy
         args:
           - --show-error-codes
         name: mypy
-        files: ^.*\.(py)$
-        entry: mypy
+        entry: poetry run mypy
         require_serial: true
-        language: python
-
-  - repo: https://github.com/commitizen-tools/commitizen
-    rev: v2.37.0
-    hooks:
-      - id: commitizen
-        stages:
-          - commit-msg
+        language: system
+        types:
+          - python

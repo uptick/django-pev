@@ -23,6 +23,5 @@ ruff = "*"
 # More info at https://nitpick.rtfd.io/en/latest/configuration.html
 style = [
     'https://raw.githubusercontent.com/uptick/.github/main/nitpick/python.toml',
-    'py://nitpick/resources/any/commitizen',
 ]
 cache = "never"
