@@ -3,7 +3,7 @@ from typing import Any
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
-from .utils import indexes, live_connections, maintenance, space
+from .utils import indexes, live_connections, maintenance, queries, space
 
 # Create your views here.
 
@@ -66,4 +66,23 @@ class ConnectionsView(BaseView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         ctx = super().get_context_data(**kwargs)
         ctx['connections'] = live_connections.get_connections_current_database()
+        return ctx
+
+class LiveQueriesView(BaseView):
+    template_name = "django_pev/live_queries.html"
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        ctx = super().get_context_data(**kwargs)
+        ctx['queries'] = queries.get_live_queries_current_database()
+        return ctx
+
+class QueriesView(BaseView):
+    template_name = "django_pev/queries.html"
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        ctx = super().get_context_data(**kwargs)
+        ctx['queries'] = queries.get_query_stats()
+        ctx['is_pg_stats_enabled'] = queries.is_pg_stat_statements_installed()
+        ctx['queries_by_io'] = sorted(queries.get_query_stats(), key=lambda i: i.shared_blks_hit, reverse=True)
+        ctx['queries_by_slowest'] = sorted(queries.get_query_stats(), key=lambda i: i.mean_time, reverse=True)
         return ctx
