@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
@@ -12,9 +13,10 @@ def index(request):
     return render(request, "django_pev/index.html")
 
 
-class BaseView(TemplateView):
+class BaseView(UserPassesTestMixin, TemplateView):
     template_name = "django_pev/indexes_view.html"
-    pass
+    def test_func(self):
+        return self.request.user.is_superuser
 
 
 class SpaceView(BaseView):
@@ -25,7 +27,6 @@ class SpaceView(BaseView):
 
         ctx["database_size"] = space.get_database_size()
         ctx["tables"] = space.get_table_sizes()
-        # ctx['indexes'] = indexes.get_indexes()
         ctx["indexes"] = space.get_index_sizes()
 
         ctx["indexes_size"] = sum(c.size_bytes for c in ctx["indexes"])
