@@ -1,0 +1,164 @@
+{% extends "django_pev/base.html" %}
+{% block content %}
+{% load humanize %}
+<div class="row">
+    <div class="card mb-4 mt-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h4 class="card-title mb-0">Slow Queries</h4>
+                    This page shows queries that consumed the most time in the database.
+                </div>
+            </div>
+            <nav>
+                <div class="nav nav-tabs mt-4" id="nav-tab" role="tablist">
+                    <button class="nav-link active" id="nav-total-tab" data-coreui-toggle="tab" data-coreui-target="#nav-total" type="button" role="tab" aria-controls="nav-total" aria-selected="true">Total Time Taken</button>
+                    <button class="nav-link" id="nav-io-tab" data-coreui-toggle="tab" data-coreui-target="#nav-io" type="button" role="tab" aria-controls="nav-io" aria-selected="false">Most IO</button>
+                    <button class="nav-link" id="nav-slowest-tab" data-coreui-toggle="tab" data-coreui-target="#nav-slowest" type="button" role="tab" aria-controls="nav-slowest" aria-selected="false">Slowest Queries</button>
+                </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-total" role="tabpanel" aria-labelledby="nav-total-tab" tabindex="0">
+                    <table  class="table">
+                        <thead>
+                            <tr>
+                            <th scope="col">Total Time</th>
+                            <th scope="col">Average Time</th>
+                            <th scope="col">Calls</th>
+                            <th scope="col">Calls/s</th>
+                            <th scope="col">Rows/call</th>
+                            <th scope="col">BLKS/s</th>
+                            <th scope="col">BLKS/call</th>
+                            <th scope="col">% of total BLKS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in queries %}
+                                <tr>
+                                    <td>{{ row.total_time_formatted }} <small>({{row.total_percent_time |floatformat:2 }}%)</small></td>
+
+                                    <td>{{ row.mean_time_formatted }} σ={{ row.stddev_time_formatted }} </td>
+                                    <td>
+                                        {{ row.calls |intcomma}}
+                                    </td>
+                                    <td>
+                                        {{ row.calls_per_second |floatformat:1 |intcomma}}
+                                    </td>
+                                    <td>
+                                        {{ row.rows_per_call|floatformat:1 |intcomma}}
+                                    </td>
+                                    <td>{{ row.shared_blks_per_second | floatformat:1 |intcomma}} </td>
+                                    <td>{{ row.shared_blks_per_call|floatformat:1 |intcomma}} </td>
+                                    <td>{{ row.total_percent_shared_blks|floatformat:2}} %</td>
+
+                                </tr>
+                                <tr>
+                                    <td colspan="100%">
+                                        <code>
+                                            {{ row.query }}
+                                        </code>
+                                    </td>
+                                </tr>
+                            {% endfor%}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade " id="nav-io" role="tabpanel" aria-labelledby="nav-io-tab" tabindex="0">
+                    <table  class="table">
+                        <thead>
+                            <tr>
+                            <th scope="col">Total Time</th>
+                            <th scope="col">Average Time</th>
+                            <th scope="col">Calls</th>
+                            <th scope="col">Calls/s</th>
+                            <th scope="col">Rows/call</th>
+                            <th scope="col">BLKS/s</th>
+                            <th scope="col">BLKS/call</th>
+                            <th scope="col">% of total BLKS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in queries_by_io %}
+                                <tr>
+                                    <td>{{ row.total_time_formatted }} <small>({{row.total_percent_time |floatformat:2 }}%)</small></td>
+
+                                    <td>{{ row.mean_time_formatted }} σ={{ row.stddev_time_formatted }} </td>
+                                    <td>
+                                        {{ row.calls |intcomma}}
+                                    </td>
+                                    <td>
+                                        {{ row.calls_per_second |floatformat:1 |intcomma}}
+                                    </td>
+                                    <td>
+                                        {{ row.rows_per_call|floatformat:1 |intcomma}}
+                                    </td>
+                                    <td>{{ row.shared_blks_per_second | floatformat:1 |intcomma}} </td>
+                                    <td>{{ row.shared_blks_per_call|floatformat:1 |intcomma}} </td>
+                                    <td>{{ row.total_percent_shared_blks|floatformat:2}} %</td>
+
+                                </tr>
+                                <tr>
+                                    <td colspan="100%">
+                                        <code>
+                                            {{ row.query }}
+                                        </code>
+                                    </td>
+                                </tr>
+                            {% endfor%}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane fade " id="nav-slowest" role="tabpanel" aria-labelledby="nav-slowest-tab" tabindex="0">
+                    <table  class="table">
+                        <thead>
+                            <tr>
+                            <th scope="col">Total Time</th>
+                            <th scope="col">Average Time</th>
+                            <th scope="col">Calls</th>
+                            <th scope="col">Calls/s</th>
+                            <th scope="col">Rows/call</th>
+                            <th scope="col">BLKS/s</th>
+                            <th scope="col">BLKS/call</th>
+                            <th scope="col">% of total BLKS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in queries_by_slowest %}
+                                <tr>
+                                    <td>{{ row.total_time_formatted }} <small>({{row.total_percent_time |floatformat:2 }}%)</small></td>
+
+                                    <td>{{ row.mean_time_formatted }} σ={{ row.stddev_time_formatted }} </td>
+                                    <td>
+                                        {{ row.calls |intcomma}}
+                                    </td>
+                                    <td>
+                                        {{ row.calls_per_second |floatformat:1 |intcomma}}
+                                    </td>
+                                    <td>
+                                        {{ row.rows_per_call|floatformat:1 |intcomma}}
+                                    </td>
+                                    <td>{{ row.shared_blks_per_second | floatformat:1 |intcomma}} </td>
+                                    <td>{{ row.shared_blks_per_call|floatformat:1 |intcomma}} </td>
+                                    <td>{{ row.total_percent_shared_blks|floatformat:2}} %</td>
+
+                                </tr>
+                                <tr>
+                                    <td colspan="100%">
+                                        <code>
+                                            {{ row.query }}
+                                        </code>
+                                    </td>
+                                </tr>
+                            {% endfor%}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="card-footer">
+        </div>
+    </div>
+</div>
+{% endblock %}

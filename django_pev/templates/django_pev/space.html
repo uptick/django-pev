@@ -1,0 +1,83 @@
+{% extends "django_pev/base.html" %}
+{% block content %}
+<div class="row">
+    <div class="card mb-4 mt-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h4 class="card-title mb-0">Space Stats</h4>
+                    <ul>
+                    <li>
+                        Total database size: {{ database_size | filesizeformat}}
+                    </li>
+                    <li>
+                        Total table size: {{ table_size | filesizeformat}}
+                    </li>
+                    <li>
+                        Total indexes size: {{ indexes_size | filesizeformat}}
+                    </li>
+                    </ul>
+                </div>
+            </div>
+
+            <nav>
+                <div class="nav nav-tabs mt-4" id="nav-tab" role="tablist">
+                    <button class="nav-link active" id="nav-tables-tab" data-coreui-toggle="tab" data-coreui-target="#nav-tables" type="button" role="tab" aria-controls="nav-tables" aria-selected="true">Tables</button>
+                    <button class="nav-link" id="nav-indexes-tab" data-coreui-toggle="tab" data-coreui-target="#nav-indexes" type="button" role="tab" aria-controls="nav-indexes" aria-selected="false">Indexes</button>
+                </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-tables" role="tabpanel" aria-labelledby="nav-tables-tab" tabindex="0">
+                    <table class="table">
+                    <thead>
+                        <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Schema</th>
+                        <th scope="col">Size</th>
+                        <th scope="col">Row Estimate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in tables %}
+                        <tr>
+                            <td>{{ row.name }}</td>
+                            <td>{{ row.schema }}</td>
+                            <td>{{ row.size_bytes | filesizeformat }}</td>
+                            <td>{{ row.row_estimate }}</td>
+                        </tr>
+                        {% endfor%}
+                    </tbody>
+                        </table>
+                </div>
+                <div class="tab-pane fade" id="nav-indexes" role="tabpanel" aria-labelledby="nav-indexes-tab" tabindex="0">
+                    <table class="table">
+                    <thead>
+                        <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Schema</th>
+                        <th scope="col">Size</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in indexes%}
+                        <tr>
+                            <td>
+                                {{ row.name }}
+                                {% if row.is_unused %}
+                                    <span class="badge text-bg-warning">Unused Index</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ row.schema }}</td>
+                            <td>{{ row.size_bytes | filesizeformat }}</td>
+                        </tr>
+                        {% endfor%}
+                    </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,20 +1,12 @@
-isort:
-	@echo "--- 🐍 Isorting 🐍 ---"
-	poetry run isort example test django_pev
+format:
+	@echo "--- 🐶 Ruff Format 🐶 ---"
+	poetry run ruff format .
 
-flake8:
-	@echo "--- 👏 Flaking 👏 ---"
-	poetry run flake8
+ruff:
+	@echo "--- 🐶 Ruff Lint 🐶 ---"
+	poetry run ruff check . --fix
 
-black:
-	@echo "--- 🎩 Blacking 🎩 ---"
-	poetry run black . --check
-
-mypy:
-	@echo "--- ⚡ Mypying ⚡ ---"
-	poetry run mypy
-
-lint: isort flake8 black mypy
+lint: ruff
 
 postgres:
 	docker-compose up -d
@@ -24,7 +16,7 @@ test: postgres
 	@echo "--- 💃 Testing 💃 ---"
 	poetry run python manage.py test
 
-publish:ci
+publish: ci
 	poetry publish --build
 
 ci: test lint
