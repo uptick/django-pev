@@ -67,8 +67,13 @@ yarn-error.log
 *.sublime-workspace
 *.code-workspace
 
-# VS Code editor
-.vscode/
+### VisualStudioCode ###
+.vscode/*      # Maybe .vscode/**/* instead - see comments
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
 
 # Intellij IDEA and Pycharm per-user project settings
 .idea/
