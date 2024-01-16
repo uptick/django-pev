@@ -3,7 +3,7 @@ from typing import Any
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
-from .utils import indexes, maintenance, space
+from .utils import indexes, live_connections, maintenance, space
 
 # Create your views here.
 
@@ -12,7 +12,11 @@ def index(request):
     return render(request, "django_pev/index.html")
 
 
-class SpaceView(TemplateView):
+class BaseView(TemplateView):
+    template_name = "django_pev/indexes_view.html"
+    pass
+
+class SpaceView(BaseView):
     template_name = "django_pev/space.html"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
@@ -29,7 +33,7 @@ class SpaceView(TemplateView):
         return ctx
 
 
-class MaintenanceView(TemplateView):
+class MaintenanceView(BaseView):
     template_name = "django_pev/maintenance.html"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
@@ -39,7 +43,7 @@ class MaintenanceView(TemplateView):
         return ctx
 
 
-class IndexesView(TemplateView):
+class IndexesView(BaseView):
     template_name = "django_pev/indexes_view.html"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
@@ -54,4 +58,12 @@ class IndexesView(TemplateView):
         )
 
         ctx.update(indexes.get_index_stats())
+        return ctx
+
+class ConnectionsView(BaseView):
+    template_name = "django_pev/connections.html"
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        ctx = super().get_context_data(**kwargs)
+        ctx['connections'] = live_connections.get_connections_current_database()
         return ctx

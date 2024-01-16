@@ -1,0 +1,64 @@
+{% extends "django_pev/base.html" %}
+{% block content %}
+<div class="row">
+    <div class="card mb-4 mt-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h4 class="card-title mb-0">Live Connections</h4>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <div>
+                    <ul>
+                        <li>
+                            <b> Total connections: </b> {{ connections| length}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <table  class="table">
+                <thead>
+                    <tr>
+                    <th scope="col">PID</th>
+                    <th scope="col">User</th>
+                    <th scope="col">Source</th>
+                    <th scope="col">IP</th>
+                    <th scope="col">Open Since</th>
+                    <th scope="col">Query begin time</th>
+                    <th scope="col">Wait Event</th>
+                    <th scope="col">State</th>
+                    <th scope="col">Query</th>
+                    <th scope="col">SSL?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in connections%}
+                    <tr id="#{{row.name}}">
+                        <td>{{ row.pid }}</td>
+                        <td>{{ row.user }}</td>
+                        <td>{{ row.source }}</td>
+                        <td>{{ row.ip }}</td>
+                        <td>{{ row.backend_start | timesince }}</td>
+                        <td>{{ row.query_start | timesince }}</td>
+                        <td>{{ row.wait_event }}</td>
+                        <td>{{ row.start }}</td>
+                        <td>{{ row.query }}</td>
+                        <td>
+                            {% if row.ssl %}
+                            <i class="fa-solid fa-check"></i>
+                            {% endif%}
+                        </td>
+                    </tr>
+                    {% endfor%}
+                </tbody>
+            </table>
+
+        </div>
+        <div class="card-footer">
+        </div>
+    </div>
+</div>
+{% endblock %}
