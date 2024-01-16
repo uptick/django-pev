@@ -23,6 +23,7 @@ def get_tables_missing_indexes() -> list[tuple[str, str, str, int]]:
         cursor.execute(sql)
         return cursor.fetchall()
 
+
 @dataclasses.dataclass
 class TableInfo:
     schema: str
@@ -38,7 +39,11 @@ class TableInfo:
 
     @property
     def requires_index(self) -> bool:
-        return self.idx_scan > 0 and (100 * self.idx_scan / (self.seq_scan + self.idx_scan)) < 95 and self.live_rows >= 10000
+        return (
+            self.idx_scan > 0
+            and (100 * self.idx_scan / (self.seq_scan + self.idx_scan)) < 95
+            and self.live_rows >= 10000
+        )
 
     @property
     def index_hit_rate(self) -> float:
@@ -46,7 +51,8 @@ class TableInfo:
 
     @property
     def index_hit_rate_formatted(self) -> str:
-        return f"{self.index_hit_rate * 100:0.2f}%" if self.index_hit_rate else ""
+        return f"{self.index_hit_rate * 100: 0.2f}%" if self.index_hit_rate else ""
+
 
 def get_maintenance_info() -> list[TableInfo]:
     sql = """

@@ -8,22 +8,26 @@ from django.db import connection
 class RelationSpaceStat:
     schema: str
     name: str
-    type: Literal['table', 'index']
+    type: Literal["table", "index"]
     size_bytes: int
     row_estimate: int
+
 
 def get_database_size() -> int:
     """Returns the size of the current database in bytes"""
     with connection.cursor() as cursor:
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT pg_database_size(current_database()) as database_size
-        """)
+        """
+        )
         return cursor.fetchone()[0]
 
 
 def get_relation_sizes() -> list[RelationSpaceStat]:
     with connection.cursor() as cursor:
-        cursor.execute("""
+        cursor.execute(
+            """
 SELECT
     n.nspname AS schema,
     c.relname AS name,
@@ -41,12 +45,14 @@ WHERE
 ORDER BY
     pg_table_size(c.oid) DESC,
     2 ASC
-""")
+"""
+        )
         return [RelationSpaceStat(*row) for row in cursor.fetchall()]
 
+
 def get_table_sizes() -> list[RelationSpaceStat]:
-    return  [r for r in get_relation_sizes() if r.type == 'table']
+    return [r for r in get_relation_sizes() if r.type == "table"]
+
 
 def get_index_sizes() -> list[RelationSpaceStat]:
-    return  [r for r in get_relation_sizes() if r.type == 'index']
-
+    return [r for r in get_relation_sizes() if r.type == "index"]
