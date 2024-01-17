@@ -92,6 +92,12 @@ print(e.slowest.visualize(title=f"Fetching {url}"))
 
 ```
 
+# TODO
+- [ ] Add migration to ensure pg_stats_statement_info is correct
+- [ ] Do not crash when its not available
+- [ ] Add explain tab
+= [ ] Add index suggester
+
 # Disclaimer
 
 Credit goes to Pierre Giraud (@pgiraud) for PEV2 and Alex Tatiyants (@AlexTatiyants) for the original pev tool.
