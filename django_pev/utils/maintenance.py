@@ -36,6 +36,8 @@ class TableInfo:
     live_rows: int
     idx_scan: int
     seq_scan: int
+    size_bytes: int
+    row_estimate: int
 
     @property
     def requires_index(self) -> bool:
@@ -56,22 +58,48 @@ class TableInfo:
 
 def get_maintenance_info() -> list[TableInfo]:
     sql = """
-            SELECT
-                schemaname AS schema,
-                relname AS name,
-                last_vacuum,
-                last_autovacuum,
-                last_analyze,
-                last_autoanalyze,
-                n_dead_tup AS dead_rows,
-                n_live_tup AS live_rows,
-                idx_scan,
-                seq_scan
-            FROM
-                pg_stat_user_tables
-            ORDER BY
-                1, 2
-    """
+WITH space_stats AS (
+    SELECT
+        n.nspname AS schema,
+        c.relname AS name,
+        CASE WHEN c.relkind = 'r' THEN 'table' ELSE 'index' END AS type,
+        pg_table_size(c.oid) AS size_bytes,
+        (case WHEN reltuples < 0 THEN 0 else reltuples END)::int as row_estimate
+    FROM
+        pg_class c
+    LEFT JOIN
+        pg_namespace n ON n.oid = c.relnamespace
+    WHERE
+        n.nspname NOT IN ('pg_catalog', 'information_schema')
+        AND n.nspname !~ '^pg_toast'
+        AND c.relkind = 'r'
+), maintenance_stats as (
+    SELECT
+        schemaname AS schema,
+        relname AS name,
+        last_vacuum,
+        last_autovacuum,
+        last_analyze,
+        last_autoanalyze,
+        n_dead_tup AS dead_rows,
+        n_live_tup AS live_rows,
+        idx_scan,
+        seq_scan
+    FROM
+        pg_stat_user_tables
+)
+SELECT
+    maintenance_stats.*,
+    size_bytes,
+    row_estimate
+FROM
+    maintenance_stats
+JOIN
+    space_stats
+ON
+    maintenance_stats.schema = space_stats.schema
+    AND maintenance_stats.name = space_stats.name
+"""
     with connection.cursor() as cursor:
         cursor.execute(sql)
         return [TableInfo(*row) for row in cursor.fetchall()]
