@@ -17,6 +17,7 @@ test: postgres
 	poetry run python manage.py test
 
 publish: ci
+	# poetry config pypi-token.pypi your-api-token
 	poetry publish --build
 
 ci: test lint

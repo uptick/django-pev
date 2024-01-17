@@ -8,6 +8,10 @@
                 <div>
                     <h4 class="card-title mb-0">Slow Queries</h4>
                     This page shows queries that consumed the most time in the database.
+                    <p>
+                    {% if not is_pg_stat_statements %}
+                    <span class="bg-warning"> <b>PG Stat Statements extension is not enabled.</b></span>
+                    {% endif %}
                 </div>
             </div>
             <nav>
