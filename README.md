@@ -6,6 +6,35 @@
 
 This tool captures sql queries and uploads the query plan to postgresql explain visualizer (PEV) by [dalibo](https://explain.dalibo.com/). This is especially helpful for debugging slow queries.
 
+This tool also exports a graphical UI similar to [pghero](https://github.com/ankane/pghero) but is embedded within your django app.
+
+# Installation
+
+1. `pip install django-pev`
+
+2. Add to your urls
+
+```
+# urls.py
+from django.urls import include, path
+
+urlpatterns = [
+    # ....
+
+    path('django-pev/', include(('django_pev.urls', 'django_pev'), namespace='django_pev')),
+]
+```
+
+3. Add to your installed apps
+```
+# settings.py
+
+INSTALLED_APPS = [
+    # ...
+    "django_pev"
+]
+```
+
 # Usage
 
 Wrap some code with the explain context manager. All sql queries are captured
