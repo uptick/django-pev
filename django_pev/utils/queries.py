@@ -146,7 +146,7 @@ WITH query_stats AS (
         queryid as query_id,
         md5(query) as query_md5,
         rolname AS user,
-        (total_plan_time + total_exec_time) as total_time,
+        (total_exec_time) as total_time,
         mean_exec_time as mean_time,
         stddev_exec_time as stddev_time,
         shared_blks_hit,
@@ -168,7 +168,7 @@ WITH query_stats AS (
         pg_database.datname = current_database()
 ), totals AS (
     SELECT
-        SUM(total_plan_time + total_exec_time) as total_time,
+        SUM(total_exec_time) as total_time,
         SUM(calls) as total_calls,
         SUM(shared_blks_hit) as total_shared_blks_hit,
         SUM(shared_blks_dirtied) as total_shared_blks_dirtied,
