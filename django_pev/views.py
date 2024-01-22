@@ -161,7 +161,7 @@ class ExplainVisualize(FormView, BaseView):
             "explain_id": explain_id,
             "explain_set": explain_set,
             "plan": explain_plan,
-            "query": query.sql,
+            "query": query,
         }
 
         cache.set(
@@ -191,7 +191,9 @@ class EmbeddedPev(BaseView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         ctx = super().get_context_data(**kwargs)
         explain_context: dict = cache.get(get_cache_key(self.request.GET["explain_id"]))
-        ctx["query"] = explain_context["query"]
+        ctx["query"] = explain_context["query"].sql
         ctx["plan"] = explain_context["plan"]
+        ctx["url"] = explain_context["explain_set"].url
+        ctx["duration"] = explain_context["query"].duration
 
         return ctx
