@@ -104,3 +104,6 @@ coverage.json
 .coverage*
 htmlcov/
 .cache
+
+# Eggs
+django_pev.egg-info/

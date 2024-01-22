@@ -133,7 +133,7 @@ class ExplainView(FormView, BaseView):
         # Overriding settings
 
         with explain(url=url) as e:
-            client.get(url)
+            client.get(url, follow=True)
 
         return self.render_to_response(self.get_context_data(form=form, explain=e))
 
@@ -141,6 +141,8 @@ class ExplainView(FormView, BaseView):
         ctx = super().get_context_data(**kwargs)
 
         ctx["explain"] = explain
+        if form:
+            ctx["url"] = form.cleaned_data["url"]
         if explain and explain.queries:
             cache.set(
                 get_cache_key(explain.id),

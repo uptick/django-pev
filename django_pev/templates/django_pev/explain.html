@@ -14,7 +14,7 @@
                 <form action="/django-pev/explain" method="post">
                     {% csrf_token %}
                     <label for="id_url" class="form-label"> <b>Page url </b></label>
-                    <input type="text"  class="form-control" name="url" value="/api/v2/tasks/" required="true" id="id_url">
+                    <input type="text"  class="form-control" name="url" value="{{url}}" required="true" id="id_url">
                     <div id="helpBlock" class="form-text">
                         The url should not include the protocol or the base url. For example (/dashboard/) .
                     </div>
@@ -22,7 +22,7 @@
                 </form>
             </div>
 
-            {% if explain %}
+            {% if explain and explain.queries %}
 
             <div class="card p-4 mt-1">
                 <h5> Slowest Query {{ slowest.duration|floatformat:4 }}s
@@ -76,7 +76,10 @@
                 {% endfor %}
                 </ol>
             </div>
-
+            {% elif explain %}
+            <div class="mt-4">
+                <h5> No queries executed (probably a redirect.)</h5>
+            </div>
             {% endif %}
 
         </div>
