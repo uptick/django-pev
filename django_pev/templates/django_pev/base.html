@@ -13,13 +13,15 @@
     </head>
 
     <body class="app">
-    <!-- Header content here -->
-    <!-- Sidebar content here -->
-        <div id="sidebar" class="sidebar sidebar-show sidebar-fixed">
-            <div class="sidebar-brand d-none d-md-flex">
-                <h3> Django PEV </h3>
-            </div>
-            <ul class="sidebar-nav">
+        <header class="header">
+            <a class="header-brand" href="#">
+                <h3>Django PEV</h3>
+            </a>
+            <button class="header-toggler" type="button">
+                <span class="header-toggler-icon"></span>
+            </button>
+
+            <ul class="header-nav mr-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'django_pev:queries' %}">
                         <i class="nav-icon fa-solid fa-clipboard-question"></i> Queries
@@ -56,25 +58,27 @@
                     </a>
                 </li>
             </ul>
-        </div>
-        <div class="wrapper d-flex flex-column min-vh-100 bg-light">
-            <div class="body flex-grow-1 px-3">
-                <div class="sidebar-open container-lg">
+        </header>
+    </div>
+    <div class="wrapper d-flex flex-column min-vh-100 bg-light">
+
+        <div class="body flex-grow-1 ">
+            <div class="container-xl">
                 {% block content %}
                     <div class="card">
                         <div class="card-body">
-                        {% block inner_content %}
-                        {% endblock %}
+                            {% block inner_content %}
+                            {% endblock %}
                         </div>
                     </div>
                 {% endblock %}
-                </div>
-        <!-- Main content here -->
             </div>
+        <!-- Main content here -->
         </div>
+    </div>
 
-        <footer class="app-footer">
+    <footer class="app-footer">
         <!-- Footer content here -->
-        </footer>
-    </body>
+    </footer>
+</body>
 </html>
