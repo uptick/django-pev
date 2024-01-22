@@ -11,7 +11,7 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-between mt-4">
-                    <form action="/django-pev/explain" method="post">
+                    <form action="/django-pev/explain" method="get">
                         {% csrf_token %}
                         <label for="id_url" class="form-label"> <b>Page url </b></label>
                         <input type="text"  class="form-control" name="url" value="{{url}}" required="true" id="id_url">

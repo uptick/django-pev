@@ -8,6 +8,7 @@ from django.core.cache import cache
 from django.http import HttpRequest, HttpResponseRedirect
 from django.http.response import HttpResponse as HttpResponse
 from django.shortcuts import render
+from django.test import Client as TestClient
 from django.urls import reverse
 from django.views.generic import FormView, TemplateView
 
@@ -109,47 +110,29 @@ class QueriesView(BaseView):
         return ctx
 
 
-class ExplainForm(forms.Form):
-    url = forms.CharField(help_text="The URL to explain eg: /dashboard/")
-
-    def send_email(self):
-        # send email using the self.cleaned_data dictionary
-        pass
-
-
-class ExplainView(FormView, BaseView):
+class ExplainView(BaseView):
     template_name = "django_pev/explain.html"
-    form_class = ExplainForm
 
-    def form_valid(self, form: ExplainForm):
-        url = form.cleaned_data["url"]
-        from django.test import Client as TestClient
-
-        client = TestClient()
-        # Authentication
-
-        client.force_login(self.request.user)  # type:ignore
-
-        # Overriding settings
-
-        with explain(url=url) as e:
-            client.get(url, follow=True)
-
-        return self.render_to_response(self.get_context_data(form=form, explain=e))
-
-    def get_context_data(self, form=None, explain: ExplainSet | None = None, **kwargs: Any) -> dict[str, Any]:
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         ctx = super().get_context_data(**kwargs)
+        explain_result = None
 
-        ctx["explain"] = explain
-        if form:
-            ctx["url"] = form.cleaned_data["url"]
-        if explain and explain.queries:
+        if url := self.request.GET.get("url"):
+            client = TestClient()
+            client.force_login(self.request.user)  # type:ignore
+
+            with explain(url=url) as e:
+                client.get(url, follow=True)
+            explain_result = e
+
+        ctx["explain"] = explain_result
+        if explain_result and explain_result.queries:
             cache.set(
-                get_cache_key(explain.id),
-                explain,
+                get_cache_key(explain_result.id),
+                explain_result,
                 timeout=getattr(settings, "DJANGO_PEV_CACHE_TIMEOUT", 60 * 60 * 24),
             )
-            ctx["slowest"] = explain.slowest
+            ctx["slowest"] = explain_result.slowest
 
         return ctx
 
@@ -157,10 +140,6 @@ class ExplainView(FormView, BaseView):
 class AnalyzeForm(forms.Form):
     explainset_id = forms.CharField()
     query_index = forms.CharField()
-
-    def send_email(self):
-        # send email using the self.cleaned_data dictionary
-        pass
 
 
 class ExplainVisualize(FormView, BaseView):
