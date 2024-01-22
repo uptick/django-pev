@@ -1,0 +1,90 @@
+{% extends "django_pev/base.html" %}
+{% block content %}
+{% load humanize %}
+<div class="row">
+    <div class="card mb-4 mt-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h4 class="card-title mb-0">Explain Query</h4>
+                    This page helps find the slowest queries of a page and explains it using an embedded version of <a href="https://explain.dalibo.com">Postgres Explain Visualizer 2 (by dalibo)</a>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+                <form action="/django-pev/explain" method="post">
+                    {% csrf_token %}
+                    <label for="id_url" class="form-label"> <b>Page url </b></label>
+                    <input type="text"  class="form-control" name="url" value="/api/v2/tasks/" required="true" id="id_url">
+                    <div id="helpBlock" class="form-text">
+                        The url should not include the protocol or the base url. For example (/dashboard/) .
+                    </div>
+                    <input class="btn btn-primary" type="submit" value="Submit" />
+                </form>
+            </div>
+
+            {% if explain %}
+
+            <div class="card p-4 mt-1">
+                <h5> Slowest Query {{ slowest.duration|floatformat:4 }}s
+                </h5>
+                <form action="{% url 'django_pev:explain-visualize' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="explainset_id" value="{{explain.id}}" />
+                    <input type="hidden" name="query_index" value="{{slowest.index}}" />
+                    <input class="btn btn-primary" type="submit" value="Analyze">
+                    </input>
+                </form>
+                <div>
+                    <code>
+                        {{ slowest.sql }}
+                    </code>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <h5> All Queries {{explain.queries | length}}</h5>
+                <ol>
+                {% for query in explain.queries %}
+
+                    <li>
+                        {{ query.duration | floatformat:4}}s
+                        <code>{{ query.sql | truncatechars:100 }}</code>
+
+                        <p class="d-inline-flex gap-1">
+
+                            <form action="{% url 'django_pev:explain-visualize' %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="explainset_id" value="{{explain.id}}" />
+                                <input type="hidden" name="query_index"   value="{{query.index}}" />
+                                <input class="btn btn-primary" type="submit" value="Analyze" />
+                                <button class="btn btn-secondary" type="button" data-coreui-toggle="collapse" data-coreui-target="#query{{query.index}}" aria-expanded="false" aria-controls="collapseExample">
+                                    Show Query
+                                </button>
+                            </form>
+
+                        </p>
+
+                        <div class="collapse" id="query{{query.index}}">
+                            <div class="card card-body">
+                                <code>
+                                    {{ query.sql }}
+                                </code>
+                            </div>
+                        </div>
+                    </li>
+
+                {% endfor %}
+                </ol>
+            </div>
+
+            {% endif %}
+
+        </div>
+
+
+
+        <div class="card-footer">
+        </div>
+    </div>
+</div>
+{% endblock %}

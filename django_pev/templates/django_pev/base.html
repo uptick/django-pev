@@ -14,53 +14,52 @@
 
     <body class="app">
     <!-- Header content here -->
-        <header class="header">
-            <a class="header-brand" href="#">
-                Django PEV
-            </a>
-        </header>
-
-        <div class="app-body">
-        <!-- Sidebar content here -->
-            <div id="sidebar" class="sidebar sidebar-show sidebar-fixed">
-                <div class="sidebar-brand d-none d-md-flex">
-                    <h3> Django PEV </h3>
-                </div>
-                <ul class="sidebar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'django_pev:queries' %}">
-                            <i class="nav-icon fa-solid fa-clipboard-question"></i> Queries
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'django_pev:space' %}">
-                            <i class="nav-icon fa-solid fa-chart-pie"></i> Space
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'django_pev:indexes' %}">
-                            <i class="nav-icon fa-solid fa-bookmark"></i> Indexes
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'django_pev:live-queries' %}">
-                            <i class="nav-icon fa-solid fa-play"></i> Live Queries
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'django_pev:connections' %}">
-                            <i class="nav-icon fa-solid fa-wifi "></i> Connections
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'django_pev:maintenance' %}">
-                            <i class="nav-icon fa-solid fa-hammer"></i> Table Maintenance
-                        </a>
-                    </li>
-                </ul>
+    <!-- Sidebar content here -->
+        <div id="sidebar" class="sidebar sidebar-show sidebar-fixed">
+            <div class="sidebar-brand d-none d-md-flex">
+                <h3> Django PEV </h3>
             </div>
+            <ul class="sidebar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'django_pev:queries' %}">
+                        <i class="nav-icon fa-solid fa-clipboard-question"></i> Queries
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'django_pev:space' %}">
+                        <i class="nav-icon fa-solid fa-chart-pie"></i> Space
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'django_pev:indexes' %}">
+                        <i class="nav-icon fa-solid fa-bookmark"></i> Indexes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'django_pev:live-queries' %}">
+                        <i class="nav-icon fa-solid fa-play"></i> Live Queries
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'django_pev:connections' %}">
+                        <i class="nav-icon fa-solid fa-wifi "></i> Connections
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'django_pev:explain' %}">
+                        <i class="nav-icon fa-solid fa-ambulance"></i> Explain Query
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'django_pev:maintenance' %}">
+                        <i class="nav-icon fa-solid fa-hammer"></i> Table Maintenance
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="wrapper d-flex flex-column min-vh-100 bg-light">
             <div class="body flex-grow-1 px-3">
-                <div class="container-lg">
+                <div class="sidebar-open container-lg">
                 {% block content %}
                     <div class="card">
                         <div class="card-body">
@@ -72,7 +71,6 @@
                 </div>
         <!-- Main content here -->
             </div>
-    {% comment %} End app-body {% endcomment %}
         </div>
 
         <footer class="app-footer">
