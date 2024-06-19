@@ -35,6 +35,7 @@ INSTALLED_APPS = [
 ]
 ```
 
+
 # Usage
 
 Wrap some code with the explain context manager. All sql queries are captured
@@ -69,6 +70,13 @@ print(e.slowest.stacktrace)
 pev_response.delete()
 ```
 
+Optionally configure additional settings:
+```python
+# Replace the default test client used during explain with a custom class
+DJANGO_PEV_EXPLAIN_TEST_CLIENT = 'django.test.Client'
+
+```
+
 **How to debug a slow endpoint in production**
 
 If you have access to `python manage.py shell` on the production server;
@@ -96,7 +104,7 @@ print(e.slowest.visualize(title=f"Fetching {url}"))
 - [ ] Add migration to ensure pg_stats_statement_info is correct
 - [ ] Do not crash when its not available
 - [ ] Add explain tab
-= [ ] Add index suggester
+- [ ] Add index suggester
 
 # Disclaimer
 

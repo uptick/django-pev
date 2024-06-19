@@ -8,8 +8,8 @@ from django.core.cache import cache
 from django.http import HttpRequest, HttpResponseRedirect
 from django.http.response import HttpResponse as HttpResponse
 from django.shortcuts import render
-from django.test import Client as TestClient
 from django.urls import reverse
+from django.utils.module_loading import import_string
 from django.views.generic import FormView, TemplateView
 
 from .utils import ExplainSet, explain, indexes, live_connections, maintenance, queries, space
@@ -116,6 +116,7 @@ class ExplainView(BaseView):
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         ctx = super().get_context_data(**kwargs)
         explain_result = None
+        TestClient = import_string(getattr(settings, "DJANGO_PEV_EXPLAIN_TEST_CLIENT", "django.test.Client"))
 
         if url := self.request.GET.get("url"):
             client = TestClient()
