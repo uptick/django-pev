@@ -27,21 +27,33 @@ CursorWrapper._original_execute = CursorWrapper._execute  # type:ignore
 CursorWrapper._original_executemany = CursorWrapper._executemany  # type:ignore
 
 
-@contextmanager
-def record_sql(
-    self: CursorWrapper,
-    sql: str,
-    params: Any,
-):
+class record_sql:
     """Record the SQL query and parameters for use in the explain view"""
-    thread_local_query_count.query_count = getattr(thread_local_query_count, "query_count", 0) + 1
-    start_time = time.time()
-    try:
-        yield
-    finally:
-        duration = time.time() - start_time
+
+    def __init__(self, cursor_wrapper: CursorWrapper, sql: str, params: Any):
+        """Record the SQL query and parameters for use in the explain view"""
+        self.cursor_wrapper = cursor_wrapper
+        self.sql = sql
+        self.params = params
+        self.start_time = time.time()
+        self.stack_trace = ""
+
+    def __enter__(self):
+        thread_local_query_count.query_count = getattr(thread_local_query_count, "query_count", 0) + 1
+        frame_stack = traceback.extract_stack(limit=100)
+        filtered_frame_stack = [
+            x for x in frame_stack if not ("django_pev" in x.filename or "django/db" in x.filename)
+        ][-10:]
+        self.stack_trace = "".join(traceback.format_list(filtered_frame_stack))
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        duration = time.time() - self.start_time
         thread_local_query_count.queries = getattr(thread_local_query_count, "queries", []) + [
-            {"time": duration, "sql": self.cursor.mogrify(sql, params).decode("utf-8")}
+            {
+                "time": duration,
+                "sql": self.cursor_wrapper.cursor.mogrify(self.sql, self.params).decode("utf-8"),
+                "stack_trace": self.stack_trace,
+            }
         ]
 
 
@@ -164,7 +176,7 @@ def explain(
                 index=index,
                 duration=float(q["time"]),
                 sql=sqlparse.format(q["sql"], reindent=True, keyword_case="upper"),
-                stack_trace="".join(traceback.format_stack()[-trace_limit:-2]),
+                stack_trace=q["stack_trace"],
                 db_alias=db_alias,
             )
         )
