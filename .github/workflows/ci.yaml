@@ -2,17 +2,19 @@ name: CI
 on:
   push:
     branches:
-      - release/*
-      - develop
-      - master
-      - main
+    - release/*
+    - develop
+    - master
+    - main
   pull_request: {}
 
 permissions:
   id-token: write # Required for federated aws oidc
-  contents: read
   actions: read
-  pull-requests: write
+  contents: write # to be able to publish a GitHub release
+  issues: write # to be able to comment on released issues
+  pull-requests: write # to be able to comment on released pull requests
+
 
 jobs:
   ci:
