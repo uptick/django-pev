@@ -1,24 +1,25 @@
 format:
 	@echo "--- 🐶 Ruff Format 🐶 ---"
-	poetry run ruff format .
+	uv run ruff format .
 
 ruff:
 	@echo "--- 🐶 Ruff Lint 🐶 ---"
-	poetry run ruff check . --fix
+	uv run ruff check . --fix
 
 lint: ruff
 
 postgres:
-	docker-compose up -d
+	docker compose up -d
 	until psql postgres://postgres@localhost:5435/example -c 'select 1'; do sleep 2; done
 
 test: postgres
 	@echo "--- 💃 Testing 💃 ---"
-	poetry run python manage.py test
+	uv run python manage.py test
 
 publish: ci
 	# poetry config pypi-token.pypi your-api-token
-	poetry publish --build
+	uv build
+	uv publish
 
 ci: test lint
 
