@@ -9,7 +9,7 @@ ruff:
 lint: ruff
 
 postgres:
-	docker-compose up -d
+	docker compose up -d
 	until psql postgres://postgres@localhost:5435/example -c 'select 1'; do sleep 2; done
 
 test: postgres
