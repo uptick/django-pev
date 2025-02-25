@@ -23,5 +23,5 @@ jobs:
     with:
       aws: true
       python: true
-      poetry: true
+      uv: true
       command: make ci

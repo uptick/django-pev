@@ -2,9 +2,7 @@ version: "3.4"
 
 services:
   db:
-    image: postgis/postgis:13-3.0-alpine
-    volumes:
-      - ${PWD}/var:/share
+    image: postgres:17-alpine
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
       - POSTGRES_DB=example
