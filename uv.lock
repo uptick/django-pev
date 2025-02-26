@@ -38,7 +38,7 @@ wheels = [
 
 [[package]]
 name = "django-pev"
-version = "0.3.0"
+version = "0.3.1"
 source = { editable = "." }
 dependencies = [
     { name = "django" },
@@ -56,8 +56,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "django", specifier = ">=3.2,<5.1.0" },
-    { name = "psycopg2", specifier = ">=2.9.10" },
+    { name = "django", specifier = ">=3.2,<5.2.0" },
+    { name = "psycopg2", specifier = "~=2.9.0" },
     { name = "sqlparse", specifier = ">=0.5.3" },
 ]
 
