@@ -110,11 +110,13 @@ print(e.slowest.visualize(title=f"Fetching {url}"))
 
 ```
 
+# How do I
+## Create a release
+Just merge to main and let Release Please bot do its job. Merge the release branch to publish to pypi.
+
 # TODO
 - [ ] Add migration to ensure pg_stats_statement_info is correct
-- [ ] Do not crash when its not available
-- [ ] Add explain tab
-- [ ] Add index suggester
+
 
 # Disclaimer
 
