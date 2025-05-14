@@ -166,7 +166,7 @@ class ExplainVisualize(FormView, BaseView):
             "explain_set": explain_set,
             "plan": explain_plan,
             "query": query,
-            "optimization_prompt": query.optimization_prompt(analyze=True),
+            "optimization_prompt": query.optimization_prompt(analyze=is_analyze),
         }
 
         cache.set(
