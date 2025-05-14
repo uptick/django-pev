@@ -112,6 +112,8 @@ class QueriesView(BaseView):
 
 
 class ExplainView(BaseView):
+    """List view of queries resulting from an explain request on a url"""
+
     template_name = "django_pev/explain.html"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
@@ -128,6 +130,10 @@ class ExplainView(BaseView):
             explain_result = e
 
         ctx["explain"] = explain_result
+        # Find Nplus ones; from explain_result.queries fingerprints
+
+        ctx["nplusones"] = explain_result.nplusones if explain_result else {}
+
         if explain_result and explain_result.queries:
             cache.set(
                 get_cache_key(explain_result.id),

@@ -7,6 +7,7 @@ import uuid
 import webbrowser
 from contextlib import contextmanager
 from dataclasses import dataclass, field
+from itertools import groupby
 from threading import local
 from typing import Any
 
@@ -77,6 +78,7 @@ class Explain:
     sql: str
     stack_trace: str
     db_alias: str
+    fingerprint: str
 
     def __repr__(self) -> str:
         return f"Explain(duration={self.duration} sql={self.sql[:20]})"
@@ -224,6 +226,15 @@ class ExplainSet:
 
         return sorted(self.queries, key=lambda q: q.duration, reverse=True)[0]
 
+    @property
+    def nplusones(self) -> dict[Explain, int]:
+        ret = {}
+        for _, group in groupby(sorted(self.queries, key=lambda q: q.fingerprint), key=lambda q: q.fingerprint):
+            group_list = list(group)
+            if len(group_list) > 3:
+                ret[group_list[0]] = len(group_list)
+        return ret
+
 
 @contextmanager
 def explain(
@@ -263,5 +274,34 @@ def explain(
                 sql=sqlglot.transpile(q["sql"], read="postgres", pretty=True)[0],
                 stack_trace=q["stack_trace"],
                 db_alias=db_alias,
+                fingerprint=generate_fingerprint(q["sql"]) or q["sql"],
             )
         )
+
+
+def generate_fingerprint(sql_query: str) -> str | None:
+    try:
+        # Parse the query
+        expression_tree = sqlglot.parse_one(sql_query, read="postgres")
+
+        # Define a transformer function to replace literals
+        def replace_literals(node):
+            # Check if the node is a Literal (number, string, boolean, etc.)
+            if isinstance(node, exp.Literal):
+                # Replace the literal with a placeholder.
+                # You could use '?' or a string like '<value>'
+                return exp.Placeholder()  # or exp.Literal.from_arg('<value>')
+            return node  # Return the node unchanged if it's not a literal
+
+        # Apply the transformation across the entire AST
+        fingerprinted_tree = expression_tree.transform(replace_literals)
+
+        # Generate the SQL string back from the modified AST
+        # Use pretty=False and identify=False for canonical representation
+        fingerprint_sql = fingerprinted_tree.sql(pretty=False, identify=False)
+
+        return fingerprint_sql
+
+    except sqlglot.errors.ParseError as e:
+        print(f"Error parsing query: {e}")
+        return None  # Handle parsing errors
