@@ -63,6 +63,16 @@ print(pev_response.url)
 # View the postgres explain visualization
 e.slowest.visualize_in_browser()
 
+
+# Print the optimization prompt
+e.slowest.optimization_prompt()
+
+# Find N+1 queries
+for query, count in e.nplusones.items():
+    print(f"Found N+1 query executed {count} times:")
+    print(query.sql)
+    print(f"Stack trace:\n{query.stack_trace}")
+
 # View the stack trace of the slowest query
 print(e.slowest.stacktrace)
 

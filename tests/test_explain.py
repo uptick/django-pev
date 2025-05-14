@@ -25,7 +25,7 @@ class TestExplain(TestCase):
 
         assert e.n_queries == 3, "We should have captured 3 queries"
 
-        assert "pg_sleep" in e.slowest.sql, "The slowest query should be the one with pg_sleep"
+        assert "PG_SLEEP" in e.slowest.sql, "The slowest query should be the one with pg_sleep"
 
     def test_upload_plan_to_dalibo(self):
         # We can upload results to dalibo
@@ -46,3 +46,10 @@ class TestExplain(TestCase):
         pev_result = e.slowest.visualize_in_browser()
 
         pev_result.delete()
+
+    def test_optimization_prompt(self):
+        # We can upload results to dalibo
+        with explain() as e:
+            list(Student.objects.filter(name="1"))
+
+        e.slowest.optimization_prompt(analyze=True)

@@ -1,3 +1,4 @@
+import logging
 import uuid
 from typing import Any
 
@@ -14,7 +15,7 @@ from django.views.generic import FormView, TemplateView
 
 from .utils import ExplainSet, explain, indexes, live_connections, maintenance, queries, space
 
-# Create your views here.
+logger = logging.getLogger(__name__)
 
 
 def get_cache_key(explainset_id: Any) -> str:
@@ -111,6 +112,8 @@ class QueriesView(BaseView):
 
 
 class ExplainView(BaseView):
+    """List view of queries resulting from an explain request on a url"""
+
     template_name = "django_pev/explain.html"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
@@ -127,6 +130,10 @@ class ExplainView(BaseView):
             explain_result = e
 
         ctx["explain"] = explain_result
+        # Find Nplus ones; from explain_result.queries fingerprints
+
+        ctx["nplusones"] = explain_result.nplusones if explain_result else {}
+
         if explain_result and explain_result.queries:
             cache.set(
                 get_cache_key(explain_result.id),
@@ -141,6 +148,7 @@ class ExplainView(BaseView):
 class AnalyzeForm(forms.Form):
     explainset_id = forms.CharField()
     query_index = forms.CharField()
+    analyze = forms.BooleanField(required=False)
 
 
 class ExplainVisualize(FormView, BaseView):
@@ -155,7 +163,8 @@ class ExplainVisualize(FormView, BaseView):
         assert isinstance(explain_set, ExplainSet)
 
         query = explain_set.queries[int(form.cleaned_data["query_index"])]
-        explain_plan = query.explain()
+        is_analyze = bool(form.cleaned_data["analyze"])
+        explain_plan = query.explain(analyze=is_analyze)
         explain_id = str(uuid.uuid4())
 
         context = {
@@ -163,6 +172,7 @@ class ExplainVisualize(FormView, BaseView):
             "explain_set": explain_set,
             "plan": explain_plan,
             "query": query,
+            "optimization_prompt": query.optimization_prompt(analyze=is_analyze),
         }
 
         cache.set(
@@ -171,7 +181,7 @@ class ExplainVisualize(FormView, BaseView):
             timeout=getattr(settings, "DJANGO_PEV_CACHE_TIMEOUT", 60 * 60 * 24),
         )
 
-        return HttpResponseRedirect(f'{reverse("django_pev:embedded-pev")}?explain_id={explain_id}')
+        return HttpResponseRedirect(f"{reverse('django_pev:embedded-pev')}?explain_id={explain_id}")
 
 
 class EmbeddedPev(BaseView):
@@ -179,13 +189,13 @@ class EmbeddedPev(BaseView):
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
         if not self.request.GET.get("explain_id"):
-            return HttpResponseRedirect(f'{reverse("django_pev:explain")}')
+            return HttpResponseRedirect(f"{reverse('django_pev:explain')}")
 
         explain_id = self.request.GET["explain_id"]
 
         explain_plan = cache.get(get_cache_key(explain_id), None)
         if not explain_plan:
-            return HttpResponseRedirect(f'{reverse("django_pev:explain")}')
+            return HttpResponseRedirect(f"{reverse('django_pev:explain')}")
 
         return super().get(request, *args, **kwargs)
 
@@ -196,5 +206,6 @@ class EmbeddedPev(BaseView):
         ctx["plan"] = explain_context["plan"]
         ctx["url"] = explain_context["explain_set"].url
         ctx["duration"] = explain_context["query"].duration
+        ctx["ai_prompt"] = explain_context["optimization_prompt"]
 
         return ctx

@@ -31,13 +31,41 @@
                             {% csrf_token %}
                             <input type="hidden" name="explainset_id" value="{{explain.id}}" />
                             <input type="hidden" name="query_index" value="{{slowest.index}}" />
-                            <input class="btn btn-primary" type="submit" value="Analyze">
-                            </input>
+                            <input name="analyze" class="btn btn-primary" type="submit" value="Analyze">
+                            <input name="explain" class="btn btn-primary" type="submit" value="Explain" />
                         </form>
                         <div>
                             <code><pre>{{ slowest.sql }}</pre></code>
                         </div>
                     </div>
+
+                   {% if nplusones %}
+                        <div class="card p-4 mt-4">
+                            <h5 style="color: red;"> N+1 Queries 😠</h5>
+                            <ol>
+                                {% for query, query_count in nplusones.items %}
+                                    <li>
+                                        <span class="badge bg-primary rounded-pill">{{ query_count}} times</span> <code> {{ query.sql | truncatechars:200 }} </code>
+                                        <form action="{% url 'django_pev:explain-visualize' %}" method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="explainset_id" value="{{explain.id}}" />
+                                            <input type="hidden" name="query_index" value="{{query.index}}" />
+                                            <input name="analyze" class="btn btn-primary btn-sm" type="submit" value="Analyze">
+                                            <input name="explain" class="btn btn-primary btn-sm" type="submit" value="Explain" />
+                                            <button class="btn btn-secondary btn-sm" type="button" data-coreui-toggle="collapse" data-coreui-target="#nplusone{{query.index}}-tb" aria-expanded="false">
+                                                Show Traceback
+                                            </button>
+                                        </form>
+                                        <div class="collapse" id="nplusone{{query.index}}-tb">
+                                            <div class="card card-body">
+                                                <code><pre>{{ query.stack_trace }}</pre></code>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ol>
+                        </div>
+                    {% endif %}
 
                     <div class="mt-4">
                         <h5> All Queries {{explain.queries | length}}</h5>
@@ -54,7 +82,8 @@
                                             {% csrf_token %}
                                             <input type="hidden" name="explainset_id" value="{{explain.id}}" />
                                             <input type="hidden" name="query_index"   value="{{query.index}}" />
-                                            <input class="btn btn-primary" type="submit" value="Analyze" />
+                                            <input name="analyze" class="btn btn-primary" type="submit" value="Analyze">
+                                            <input name="explain" class="btn btn-primary" type="submit" value="Explain" />
                                             <button class="btn btn-secondary" type="button" data-coreui-toggle="collapse" data-coreui-target="#query{{query.index}}-sql" aria-expanded="false" aria-controls="collapseExample">
                                                 Show Query
                                             </button>
@@ -84,6 +113,7 @@
                             {% endfor %}
                         </ol>
                     </div>
+
                 {% elif explain %}
                     <div class="mt-4">
                         <h5> No queries executed (probably a redirect.)</h5>
