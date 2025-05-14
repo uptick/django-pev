@@ -33,10 +33,13 @@ jobs:
   release_please_publish_pypi:
     needs: release_please
     if: ${{ needs.release_please.outputs.release_created }}
-    uses: uptick/actions/.github/workflows/ci.yaml@main
-    secrets: inherit
-    with:
-      mise: true
-      mise-install: true
-      command: |
-        mise run publish
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+      - name: Build and Publish
+        run: |
+          uv sync --frozen
+          uv build
+          uv publish
