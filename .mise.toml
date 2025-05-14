@@ -1,0 +1,50 @@
+[tools]
+uv = "latest"
+python = { version = "3.12.1", venv = ".venv" }
+
+[tasks.install]
+description = "Install dependencies using uv"
+run = "uv sync"
+
+[env]
+_.python.venv = { path = "{{config_root}}/.venv", create = true }
+
+[tasks.format]
+description = "Format code using Ruff"
+run = "uv run ruff format ."
+
+[tasks.ruff]
+description = "Lint and fix code using Ruff"
+run = "uv run ruff check . --fix"
+
+[tasks.lint]
+description = "Run Ruff lint (alias for ruff)"
+alias = "ruff"
+
+[tasks.postgres]
+description = "Start postgres with docker and wait for readiness"
+run = '''
+docker compose up -d
+until psql postgres://postgres@localhost:5435/example -c 'select 1'; do sleep 2; done
+'''
+
+[tasks.test]
+description = "Run Django tests (depends on postgres)"
+depends = ["postgres"]
+run = '''
+echo "--- 💃 Testing 💃 ---"
+uv run python manage.py test
+'''
+
+[tasks.publish]
+description = "Build and publish the package (depends on ci)"
+depends = ["ci"]
+run = '''
+# poetry config pypi-token.pypi your-api-token
+uv build
+uv publish
+'''
+
+[tasks.ci]
+description = "Run test and lint (CI pipeline)"
+depends = ["test", "lint"]
