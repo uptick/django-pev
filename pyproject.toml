@@ -1,6 +1,6 @@
 [project]
 name = "django-pev"
-version = "1.0.0"
+version = "1.0.1"
 description = "Context manager to upload explain plans to https://explain.dalibo.com/"
 authors = [{ name = "william chu", email = "william.chu@uptickhq.com" }]
 readme = "README.md"

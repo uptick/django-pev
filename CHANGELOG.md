@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/uptick/django-pev/compare/django-pev-v1.0.0...django-pev-v1.0.1) (2025-05-14)
+
+
+### Bug Fixes
+
+* fix the build pipeline ([e58674b](https://github.com/uptick/django-pev/commit/e58674b844152e8becdedb9fd949044dfa32ccbf))
+
 ## 1.0.0 (2025-05-14)
 
 
