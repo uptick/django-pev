@@ -1,5 +1,6 @@
 import logging
 import uuid
+from contextlib import suppress
 from typing import Any
 
 from django import forms
@@ -111,27 +112,62 @@ class QueriesView(BaseView):
         return ctx
 
 
-class ExplainView(BaseView):
+class ExplainForm(forms.Form):
+    url = forms.CharField(required=True)
+    http_method = forms.ChoiceField(
+        choices=[("GET", "GET"), ("POST", "POST"), ("PATCH", "PATCH"), ("PUT", "PUT"), ("DELETE", "DELETE")],
+        initial="GET",
+    )
+    body = forms.CharField(required=False)
+
+
+class ExplainView(FormView, BaseView):
     """List view of queries resulting from an explain request on a url"""
 
     template_name = "django_pev/explain.html"
+    form_class = ExplainForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        if self.request.method == "GET":
+            # Pre-populate form with GET parameters
+            kwargs["data"] = self.request.GET
+        return kwargs
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         ctx = super().get_context_data(**kwargs)
+        form = kwargs.get("form") or self.get_form()
         explain_result = None
-        TestClient = import_string(getattr(settings, "DJANGO_PEV_EXPLAIN_TEST_CLIENT", "django.test.Client"))
 
-        if url := self.request.GET.get("url"):
+        if form.is_valid():
+            TestClient = import_string(getattr(settings, "DJANGO_PEV_EXPLAIN_TEST_CLIENT", "django.test.Client"))
+            ctx["url"] = url = form.cleaned_data["url"]
+            ctx["http_method"] = http_method = form.cleaned_data["http_method"]
+            ctx["body"] = body = form.cleaned_data["body"]
+
             client = TestClient()
             client.force_login(self.request.user)  # type:ignore
 
             with explain(url=url) as e:
-                client.get(url, follow=True)
+                try:
+                    match http_method:
+                        case "GET" | "DELETE":
+                            resp = client.generic(http_method, url, follow=True)
+                        case "POST" | "PUT" | "PATCH":
+                            resp = client.generic(
+                                http_method, url, data=body, content_type="application/json", follow=True
+                            )
+                    ctx["resp_status_code"] = resp.status_code
+                    if resp.status_code >= 400:
+                        with suppress(Exception):
+                            resp_json = resp.json()
+                            ctx["error"] = resp_json
+                except Exception as exc:
+                    logger.error(f"Error fetching {url}")
+                    ctx["error"] = str(exc)
             explain_result = e
 
         ctx["explain"] = explain_result
-        # Find Nplus ones; from explain_result.queries fingerprints
-
         ctx["nplusones"] = explain_result.nplusones if explain_result else {}
 
         if explain_result and explain_result.queries:
