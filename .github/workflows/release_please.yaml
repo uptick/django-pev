@@ -1,0 +1,42 @@
+name: Release Please
+on:
+  push:
+    branches:
+    - main
+
+permissions:
+  actions: read # Read the metrics
+  contents: write # to be able to publish a GitHub release
+  issues: write # to be able to comment on released issues
+  pull-requests: write # to be able to comment on released pull requests
+  id-token: write # to enable use of OIDC for npm provenance / AWS
+
+env:
+  MISE_PYTHON_COMPILE: false
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  release_please:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: googleapis/release-please-action@v4
+      id: release
+      # Configured via: release-please-config.json and will update the manifest: .release-please-manifest.json
+      with: {}
+    outputs:
+      # Root level release_created
+      release_created: ${{ steps.release.outputs.release_created }}
+      # Root level tag_name
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      sha: ${{ steps.release.outputs.sha }}
+
+  release_please_publish_pypi:
+    needs: release_please
+    if: ${{ needs.release_please.outputs.release_created }}
+    uses: uptick/actions/.github/workflows/ci.yaml@main
+    secrets: inherit
+    with:
+      mise: true
+      mise-install: true
+      command: |
+        mise run publish

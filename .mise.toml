@@ -38,9 +38,8 @@ uv run python manage.py test
 
 [tasks.publish]
 description = "Build and publish the package (depends on ci)"
-depends = ["ci"]
 run = '''
-# poetry config pypi-token.pypi your-api-token
+uv sync --frozen
 uv build
 uv publish
 '''

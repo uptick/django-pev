@@ -1,0 +1,15 @@
+{
+    "packages": {
+      ".": {
+        "package-name": "django-pev",
+        "release-type": "python",
+        "exclude-paths": [
+            "tests/",
+            "integration_tests/",
+            "chart/",
+	        ".github/"
+        ],
+        "initial-version": "0.4.1"
+      }
+    }
+  }
