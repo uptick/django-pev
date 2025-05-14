@@ -23,5 +23,6 @@ jobs:
     with:
       aws: true
       python: true
-      uv: true
-      command: make ci
+      mise: true
+      mise-install: true
+      command: mise run ci
