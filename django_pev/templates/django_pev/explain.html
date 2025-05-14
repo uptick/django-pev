@@ -31,8 +31,8 @@
                             {% csrf_token %}
                             <input type="hidden" name="explainset_id" value="{{explain.id}}" />
                             <input type="hidden" name="query_index" value="{{slowest.index}}" />
-                            <input class="btn btn-primary" type="submit" value="Analyze">
-                            </input>
+                            <input name="analyze" class="btn btn-primary" type="submit" value="Analyze">
+                            <input name="explain" class="btn btn-primary" type="submit" value="Explain" />
                         </form>
                         <div>
                             <code><pre>{{ slowest.sql }}</pre></code>
@@ -54,7 +54,8 @@
                                             {% csrf_token %}
                                             <input type="hidden" name="explainset_id" value="{{explain.id}}" />
                                             <input type="hidden" name="query_index"   value="{{query.index}}" />
-                                            <input class="btn btn-primary" type="submit" value="Analyze" />
+                                            <input name="analyze" class="btn btn-primary" type="submit" value="Analyze">
+                                            <input name="explain" class="btn btn-primary" type="submit" value="Explain" />
                                             <button class="btn btn-secondary" type="button" data-coreui-toggle="collapse" data-coreui-target="#query{{query.index}}-sql" aria-expanded="false" aria-controls="collapseExample">
                                                 Show Query
                                             </button>

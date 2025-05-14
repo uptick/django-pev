@@ -22,6 +22,14 @@
 </style>
 
 <h5>Explain for: {{url}} ({{duration|floatformat:4}}s)</h5>
+<button onclick="copyAIPrompt()" class="btn btn-outline-primary mb-2">Copy AI Optimization Prompt</button>
+<script>
+function copyAIPrompt() {
+    const prompt = `{{ ai_prompt|escapejs }}`;
+    navigator.clipboard.writeText(prompt);
+    alert('AI optimization prompt copied to clipboard!');
+}
+</script>
 <div id="embedded_pev" class="">
   <pev2 :plan-source="plan" :plan-query="query" />
 </div>

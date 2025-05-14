@@ -63,6 +63,10 @@ print(pev_response.url)
 # View the postgres explain visualization
 e.slowest.visualize_in_browser()
 
+
+# Print the optimization prompt
+e.slowest.optimization_prompt()
+
 # View the stack trace of the slowest query
 print(e.slowest.stacktrace)
 

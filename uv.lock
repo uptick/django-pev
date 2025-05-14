@@ -43,7 +43,7 @@ source = { editable = "." }
 dependencies = [
     { name = "django" },
     { name = "psycopg2" },
-    { name = "sqlparse" },
+    { name = "sqlglot" },
 ]
 
 [package.dev-dependencies]
@@ -58,7 +58,7 @@ dev = [
 requires-dist = [
     { name = "django", specifier = ">=3.2,<5.2.0" },
     { name = "psycopg2", specifier = "~=2.9.0" },
-    { name = "sqlparse", specifier = ">=0.3.1" },
+    { name = "sqlglot", specifier = ">=18.13.0" },
 ]
 
 [package.metadata.requires-dev]
@@ -232,6 +232,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/49/79/acbc1edd03ac0e2a04ae2593555dbc9990b34090a9729a0c4c0cf20fb595/ruff-0.9.7-py3-none-win32.whl", hash = "sha256:e9ece95b7de5923cbf38893f066ed2872be2f2f477ba94f826c8defdd6ec6b7d", size = 9988751 },
     { url = "https://files.pythonhosted.org/packages/6d/95/67153a838c6b6ba7a2401241fd8a00cd8c627a8e4a0491b8d853dedeffe0/ruff-0.9.7-py3-none-win_amd64.whl", hash = "sha256:3770fe52b9d691a15f0b87ada29c45324b2ace8f01200fb0c14845e499eb0c2c", size = 11002987 },
     { url = "https://files.pythonhosted.org/packages/63/6a/aca01554949f3a401991dc32fe22837baeaccb8a0d868256cbb26a029778/ruff-0.9.7-py3-none-win_arm64.whl", hash = "sha256:b075a700b2533feb7a01130ff656a4ec0d5f340bb540ad98759b8401c32c2037", size = 10177763 },
+]
+
+[[package]]
+name = "sqlglot"
+version = "26.17.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/8e/86/461568bd63a43fd3c9d2dec42f9070905cd7b1a0a7e27cacfe91c2e386ff/sqlglot-26.17.1.tar.gz", hash = "sha256:518c649ff4ae9601e2f156758c21d3552db8a109872f1228e0f6e89d3712bf73", size = 5356122 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/81/30/2b50dd8bc227cce28aa7cb4dfa8fc174d34d1b7fb65128055d308ab6af7a/sqlglot-26.17.1-py3-none-any.whl", hash = "sha256:8772f5c1d095a9600cfbe5bdd08bc345d84f875773735a6cbe6cd5abcfa43900", size = 460536 },
 ]
 
 [[package]]
