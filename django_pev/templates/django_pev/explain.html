@@ -11,13 +11,29 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-between mt-4">
-                    <form action="/django-pev/explain" method="get">
+                    <form action="/django-pev/explain" method="get" id="explain-form">
                         {% csrf_token %}
                         <label for="id_url" class="form-label"> <b>Page url </b></label>
-                        <input type="text"  class="form-control" name="url" value="{{url}}" required="true" id="id_url">
-                        <div id="helpBlock" class="form-text">
+                        <div class="input-group mb-2">
+                            <select class="form-select fw-bold" name="http_method" id="id_http_method" style="max-width: 120px;">
+                                <option value="GET" {% if http_method == "GET" %}selected{% endif %}>GET</option>
+                                <option value="POST" {% if http_method == "POST" %}selected{% endif %}>POST</option>
+                                <option value="PATCH" {% if http_method == "PATCH" %}selected{% endif %}>PATCH</option>
+                                <option value="PUT" {% if http_method == "PUT" %}selected{% endif %}>PUT</option>
+                                <option value="DELETE" {% if http_method == "DELETE" %}selected{% endif %}>DELETE</option>
+                            </select>
+                            <input type="text"  class="form-control" name="url" value="{{url}}" required="true" id="id_url" placeholder="/dashboard/">
+                        </div>
+                        <div id="helpBlock" class="form-text mb-2">
                             The url should not include the protocol or the base url. For example (/dashboard/) .
                         </div>
+                        {% if error %}
+                        <div class="alert alert-danger mt-2" role="alert">
+                            {{ error }}
+                        </div>
+                        {% endif %}
+                        <label for="id_body" class="form-label"><b>Request Body (for POST, PATCH, PUT, DELETE)</b></label>
+                        <textarea class="form-control mb-2" name="body" id="id_body" rows="3" placeholder="JSON data">{{ body }}</textarea>
                         <input class="btn btn-primary" type="submit" value="Submit" />
                     </form>
                 </div>
