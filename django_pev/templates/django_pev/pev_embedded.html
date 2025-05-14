@@ -22,8 +22,33 @@
 </style>
 
 <h5>Explain for: {{url}} ({{duration|floatformat:4}}s)</h5>
-<button onclick="copyAIPrompt()" class="btn btn-outline-primary mb-2">Copy AI Optimization Prompt</button>
+<div id="button-group">
+  <button onclick="copyAIPrompt()" class="btn btn-outline-primary mb-2">Copy AI Optimization Prompt</button>
+  <button onclick="togglePrompt()" class="btn btn-outline-primary mb-2 ms-2">Toggle AI Prompt</button>
+</div>
+
 <script>
+function togglePrompt() {
+    const promptDiv = document.createElement('div');
+    promptDiv.id = 'ai-prompt-div';
+    promptDiv.style.whiteSpace = 'pre-wrap';
+    promptDiv.style.padding = '1rem';
+    promptDiv.style.backgroundColor = '#f8f9fa';
+    promptDiv.style.border = '1px solid #dee2e6';
+    promptDiv.style.borderRadius = '0.25rem';
+    promptDiv.style.marginBottom = '1rem';
+    promptDiv.textContent = `{{ ai_prompt|escapejs }}`;
+
+    const existingDiv = document.getElementById('ai-prompt-div');
+    if (existingDiv) {
+        existingDiv.remove();
+    } else {
+        const buttonGroup = document.getElementById('button-group');
+        buttonGroup.after(promptDiv);
+    }
+}
+
+
 function copyAIPrompt() {
     const prompt = `{{ ai_prompt|escapejs }}`;
     navigator.clipboard.writeText(prompt);

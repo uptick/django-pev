@@ -141,7 +141,7 @@ class Explain:
             # Schema: columns and types
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "SELECT column_name, data_type FROM information_schema.columns WHERE table_schema = %s AND table_name = %s",
+                    "SELECT column_name, data_type, is_nullable FROM information_schema.columns WHERE table_schema = %s AND table_name = %s",
                     [table_schema, table_name],  # type: ignore
                 )
                 table_schemas[table_name] = cursor.fetchall()
@@ -161,7 +161,10 @@ Current Execution Plan:
 Table Schemas:
 {
             chr(10).join(
-                f"{table}:{chr(10)}" + chr(10).join(f"- {col}: {dtype}" for col, dtype in schema)
+                f"{table}:{chr(10)}"
+                + chr(10).join(
+                    f"- {col}: {dtype} {'(nullable)' if nullable == 'YES' else ''}" for col, dtype, nullable in schema
+                )
                 for table, schema in table_schemas.items()
             )
         }
