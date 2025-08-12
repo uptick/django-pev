@@ -1,3 +1,4 @@
+from django.db import connection
 from django.test import TestCase
 
 from django_pev import explain
@@ -53,3 +54,16 @@ class TestExplain(TestCase):
             list(Student.objects.filter(name="1"))
 
         e.slowest.optimization_prompt(analyze=True)
+
+    def test_savepoint_parsing_error_handling(self):
+        """Test that SAVEPOINT queries that can't be parsed by sqlglot are handled gracefully"""
+        with explain() as e:
+            # Execute SAVEPOINT commands that sqlglot can't parse
+            with connection.cursor() as cursor:
+                # SQL GLOT can parse
+                cursor.execute("SAVEPOINT test_savepoint")
+
+                # SQL GLOT can't parse
+                cursor.execute("RELEASE SAVEPOINT test_savepoint")
+
+        self.assertEqual(len(e.queries), 1)

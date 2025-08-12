@@ -12,6 +12,7 @@ from threading import local
 from typing import Any
 
 import sqlglot
+import sqlglot.errors
 import sqlglot.expressions as exp
 from django.db import connection, connections
 from django.db.backends.utils import CursorWrapper
@@ -267,16 +268,19 @@ def explain(
     logger.debug(f"Captured {len(queries_after)} queries")
 
     for index, q in enumerate(queries_after):
-        result.queries.append(
-            Explain(
-                index=index,
-                duration=float(q["time"]),
-                sql=sqlglot.transpile(q["sql"], read="postgres", pretty=True)[0],
-                stack_trace=q["stack_trace"],
-                db_alias=db_alias,
-                fingerprint=generate_fingerprint(q["sql"]) or q["sql"],
+        try:
+            result.queries.append(
+                Explain(
+                    index=index,
+                    duration=float(q["time"]),
+                    sql=sqlglot.transpile(q["sql"], read="postgres", pretty=True)[0],
+                    stack_trace=q["stack_trace"],
+                    db_alias=db_alias,
+                    fingerprint=generate_fingerprint(q["sql"]) or q["sql"],
+                )
             )
-        )
+        except sqlglot.errors.ParseError as e:
+            logger.warning(f"Error parsing query: {e}")
 
 
 def generate_fingerprint(sql_query: str) -> str | None:
