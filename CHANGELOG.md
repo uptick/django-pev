@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.2](https://github.com/uptick/django-pev/compare/django-pev-v1.0.1...django-pev-v1.0.2) (2025-08-12)
+
+
+### Bug Fixes
+
+* **sqlglot:** allow skipping unparseable sql ([d18acac](https://github.com/uptick/django-pev/commit/d18acac2cdacdc2fd5c150c6d0d9caaf4e31b75a))
+* **sqlglot:** allow skipping unparseable sql ([34a96a3](https://github.com/uptick/django-pev/commit/34a96a36d1b6111a40d176942165441634c05228))
+
 ## [1.0.1](https://github.com/uptick/django-pev/compare/django-pev-v1.0.0...django-pev-v1.0.1) (2025-05-14)
 
 
