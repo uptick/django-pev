@@ -2,7 +2,7 @@ name: Release Please
 on:
   push:
     branches:
-    - main
+      - main
 
 permissions:
   actions: read # Read the metrics
@@ -18,10 +18,10 @@ jobs:
   release_please:
     runs-on: ubuntu-latest
     steps:
-    - uses: googleapis/release-please-action@v4
-      id: release
-      # Configured via: release-please-config.json and will update the manifest: .release-please-manifest.json
-      with: {}
+      - uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # ratchet:googleapis/release-please-action@v4
+        id: release
+        # Configured via: release-please-config.json and will update the manifest: .release-please-manifest.json
+        with: {}
     outputs:
       # Root level release_created
       release_created: ${{ steps.release.outputs.release_created }}
@@ -37,11 +37,11 @@ jobs:
     if: ${{ needs.release_please.outputs.release_created }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # ratchet:actions/checkout@v4
       - name: Install uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # ratchet:astral-sh/setup-uv@v6
       - name: Build and Publish
-        run: |
+        run: |-
           uv sync --frozen
           uv build
           uv publish
