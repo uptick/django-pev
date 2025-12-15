@@ -2,10 +2,10 @@ name: CI
 on:
   push:
     branches:
-    - release/*
-    - develop
-    - master
-    - main
+      - release/*
+      - develop
+      - master
+      - main
   pull_request: {}
 
 permissions:
@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   ci:
-    uses: uptick/actions/.github/workflows/ci.yaml@main
+    uses: uptick/actions/.github/workflows/ci.yaml@main # ratchet:exclude
     secrets: inherit
     with:
       aws: true
