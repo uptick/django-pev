@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/uptick/django-pev/compare/django-pev-v1.0.2...django-pev-v1.1.0) (2026-03-03)
+
+
+### Features
+
+* add support for Django 5.2 ([ca4b5f9](https://github.com/uptick/django-pev/commit/ca4b5f96786668d22404b460bf6272fcaf57333a))
+* add support for Django 5.2 ([b933163](https://github.com/uptick/django-pev/commit/b933163100aeca4a53168093738addbabf8e1d52))
+
 ## [1.0.2](https://github.com/uptick/django-pev/compare/django-pev-v1.0.1...django-pev-v1.0.2) (2025-08-12)
 
 
