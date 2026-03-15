@@ -9,20 +9,44 @@ on:
   pull_request: {}
 
 permissions:
-  id-token: write # Required for federated aws oidc
+  id-token: write
   actions: read
-  contents: write # to be able to publish a GitHub release
-  issues: write # to be able to comment on released issues
-  pull-requests: write # to be able to comment on released pull requests
+  contents: write
+  issues: write
+  pull-requests: write
 
+env:
+  PYTHONUNBUFFERED: 1
 
 jobs:
   ci:
-    uses: uptick/actions/.github/workflows/ci.yaml@main # ratchet:exclude
-    secrets: inherit
-    with:
-      aws: true
-      python: true
-      mise: true
-      mise-install: true
-      command: mise run ci
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # ratchet:actions/checkout@v6.0.1
+        with:
+          fetch-depth: 2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # ratchet:aws-actions/configure-aws-credentials@v5.1.1
+        with:
+          role-to-assume: arn:aws:iam::610829907584:role/default-github-actions-ci-role
+          role-session-name: ${{ github.repository_owner }}-${{ github.event.repository.name }}
+          aws-region: ap-southeast-2
+
+      - name: Install Python
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # ratchet:actions/setup-python@v6.1.0
+        with:
+          python-version: "3.12"
+
+      - name: Setup mise
+        uses: jdx/mise-action@146a28175021df8ca24f8ee1828cc2a60f980bd5 # ratchet:jdx/mise-action@v3.5.1
+        with:
+          install: true
+          cache: true
+          experimental: true
+
+      - name: Run CI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: mise run ci
