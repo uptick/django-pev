@@ -1,7 +1,7 @@
 import dataclasses
 from datetime import datetime
 
-from django.db import OperationalError, connection
+from django.db import DatabaseError, connection
 
 TIME_DURATION_UNITS = (
     ("week", 60 * 60 * 24 * 7 * 1000),
@@ -121,7 +121,12 @@ def is_pg_stat_statements_installed() -> bool:
             cursor.execute("SELECT 1 FROM pg_stat_statements limit 1")
             assert cursor.fetchone()
         return True
-    except (AssertionError, OperationalError):
+    except (AssertionError, DatabaseError):
+        # DatabaseError is the umbrella parent of OperationalError and
+        # InternalError. PostgreSQL 17/18 can raise an InternalError
+        # (SQLSTATE XX000) when the pg_stat_statements extension version is
+        # out of sync with the loaded shared library (e.g. mid-upgrade),
+        # which is not an OperationalError and would otherwise crash callers.
         return False
 
 
@@ -135,11 +140,35 @@ def reset_pg_stat_statements():
         cursor.execute("SELECT pg_stat_statements_reset()")
 
 
+def _shared_blk_read_time_column() -> str:
+    """Return the pg_stat_statements column name for shared block read time.
+
+    pg_stat_statements 1.11 (shipped with PostgreSQL 17) renamed
+    ``blk_read_time`` to ``shared_blk_read_time`` (and ``blk_write_time`` to
+    ``shared_blk_write_time``). To keep supporting both older PostgreSQL
+    (< 17, column ``blk_read_time``) and newer PostgreSQL (>= 17, column
+    ``shared_blk_read_time``), detect which column is actually present rather
+    than relying on the extension version string (``float('1.11') < float('1.9')``
+    makes numeric version comparison unreliable).
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT 1 FROM information_schema.columns "
+            "WHERE table_name = 'pg_stat_statements' "
+            "AND column_name = 'shared_blk_read_time'"
+        )
+        if cursor.fetchone():
+            return "shared_blk_read_time"
+    return "blk_read_time"
+
+
 def get_query_stats() -> list[QueryStatInfo]:
     if not is_pg_stat_statements_installed():
         return []
 
-    sql = """
+    blk_read_time_column = _shared_blk_read_time_column()
+
+    sql = f"""
 WITH query_stats AS (
     SELECT
         LEFT(query, 10000) AS query,
@@ -151,7 +180,7 @@ WITH query_stats AS (
         stddev_exec_time as stddev_time,
         shared_blks_hit,
         shared_blks_dirtied,
-        blk_read_time,
+        {blk_read_time_column} AS blk_read_time,
         temp_blks_written,
         temp_blks_read,
         rows,
