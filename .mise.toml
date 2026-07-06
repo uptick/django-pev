@@ -1,6 +1,6 @@
 [tools]
 uv = "latest"
-python = { version = "3.12.1", venv = ".venv" }
+python = { version = "3.13.14", venv = ".venv" }
 
 [tasks.install]
 description = "Install dependencies using uv"
