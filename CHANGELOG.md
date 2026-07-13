@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.1](https://github.com/uptick/django-pev/compare/django-pev-v1.1.0...django-pev-v1.1.1) (2026-07-06)
+
+
+### Bug Fixes
+
+* PostgreSQL 17/18 compatibility in query-stats collector ([e139079](https://github.com/uptick/django-pev/commit/e1390799f82f56004526c14921f4a03710a63f16))
+* support pg_stat_statements 1.11 (PostgreSQL 17/18) in query stats ([634ae62](https://github.com/uptick/django-pev/commit/634ae62e44814effe6548997fdba37a4541a8dfb))
+
 ## [1.1.0](https://github.com/uptick/django-pev/compare/django-pev-v1.0.2...django-pev-v1.1.0) (2026-03-03)
 
 
