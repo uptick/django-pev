@@ -1,5 +1,5 @@
 from django.db import connection
-from django.test import TestCase
+from django.test import TestCase, tag
 from time import sleep
 
 from django_pev import explain
@@ -59,6 +59,7 @@ class TestExplain(TestCase):
         # We can delete the results
         pev_result.delete()
 
+    @tag("browser")
     def test_open_visualization_in_browser(self):
         # We can upload results to dalibo
         with explain() as e:
