@@ -35,6 +35,19 @@ class TestExplain(TestCase):
 
         assert "'lol'" in e.queries[0].sql, "Query params should be interpolated into the captured SQL"
 
+    def test_executemany_is_captured(self):
+        with explain() as e:
+            with connection.cursor() as cursor:
+                cursor.executemany(
+                    "INSERT INTO school_student (name) VALUES (%s)",
+                    [("many1",), ("many2",)],
+                )
+            list(Student.objects.filter(name="many1"))
+
+        assert Student.objects.filter(name__startswith="many").count() == 2
+        assert e.n_queries == 2, "Both the executemany and the following query should be captured"
+        assert "%s" in e.queries[0].sql, "Batch queries stay parameterised as mogrify cannot bind a batch"
+
     def test_upload_plan_to_dalibo(self):
         # We can upload results to dalibo
         with explain() as e:
