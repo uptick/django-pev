@@ -23,17 +23,17 @@ class TestExplain(TestCase):
         with explain(db_alias="default") as e:
             list(Student.objects.filter(name="lol"))
             Student.objects.create(name="1")
-            list(
-                Student.objects.raw(
-                    "select school_student.*, pg_sleep(0.01) from school_student"
-                )
-            )
+            list(Student.objects.raw("select school_student.*, pg_sleep(0.01) from school_student"))
 
         assert e.n_queries == 3, "We should have captured 3 queries"
 
-        assert (
-            "PG_SLEEP" in e.slowest.sql
-        ), "The slowest query should be the one with pg_sleep"
+        assert "PG_SLEEP" in e.slowest.sql, "The slowest query should be the one with pg_sleep"
+
+    def test_captured_sql_interpolates_params(self):
+        with explain() as e:
+            list(Student.objects.filter(name="lol"))
+
+        assert "'lol'" in e.queries[0].sql, "Query params should be interpolated into the captured SQL"
 
     def test_upload_plan_to_dalibo(self):
         # We can upload results to dalibo

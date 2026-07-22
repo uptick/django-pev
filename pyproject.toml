@@ -7,17 +7,15 @@ readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
     "Framework :: Django",
-    "Framework :: Django :: 3.2",
-    "Framework :: Django :: 4.0",
-    "Framework :: Django :: 4.1",
     "Framework :: Django :: 4.2",
     "Framework :: Django :: 5.0",
     "Framework :: Django :: 5.1",
     "Framework :: Django :: 5.2",
+    "Framework :: Django :: 6.0",
 ]
 dependencies = [
-    "django>=3.2,<6.0",
-    "psycopg2~=2.9.0",
+    "django>=4.2,<6.1",
+    "psycopg>=3.1.8",
     "sqlglot>=18.13.0",
 ]
 
@@ -27,6 +25,7 @@ dev = [
     "django-stubs==4.2.7",
     "mypy>=1.8.0",
     "pdbpp>=0.10.3",
+    "psycopg[binary]>=3.1.8",
     "ruff>=0.9.7",
 ]
 

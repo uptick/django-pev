@@ -11,6 +11,7 @@ from itertools import groupby
 from threading import local
 from typing import Any
 
+import psycopg
 import sqlglot
 import sqlglot.errors
 import sqlglot.expressions as exp
@@ -56,10 +57,20 @@ class record_sql:
         thread_local_query_count.queries = getattr(thread_local_query_count, "queries", []) + [
             {
                 "time": duration,
-                "sql": self.cursor_wrapper.cursor.mogrify(self.sql, self.params).decode("utf-8"),
+                "sql": self._interpolated_sql(),
                 "stack_trace": self.stack_trace,
             }
         ]
+
+    def _interpolated_sql(self) -> str:
+        """Render the query with its parameters interpolated, as it was sent to the server.
+
+        mogrify is run on a fresh ClientCursor rather than the live cursor: mogrify
+        resets the cursor's result state, which breaks Django's row fetching if the
+        query's rows haven't been read yet.
+        """
+        with psycopg.ClientCursor(self.cursor_wrapper.cursor.connection) as client_cursor:
+            return client_cursor.mogrify(self.sql, self.params)
 
 
 def _new_execute(self, sql, params, *ignored_wrapper_args):  # type: ignore[no-untyped-def] # fmt: skip
