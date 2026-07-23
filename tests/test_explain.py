@@ -1,5 +1,5 @@
 from django.db import connection
-from django.test import TestCase
+from django.test import TestCase, tag
 from time import sleep
 
 from django_pev import explain
@@ -23,17 +23,30 @@ class TestExplain(TestCase):
         with explain(db_alias="default") as e:
             list(Student.objects.filter(name="lol"))
             Student.objects.create(name="1")
-            list(
-                Student.objects.raw(
-                    "select school_student.*, pg_sleep(0.01) from school_student"
-                )
-            )
+            list(Student.objects.raw("select school_student.*, pg_sleep(0.01) from school_student"))
 
         assert e.n_queries == 3, "We should have captured 3 queries"
 
-        assert (
-            "PG_SLEEP" in e.slowest.sql
-        ), "The slowest query should be the one with pg_sleep"
+        assert "PG_SLEEP" in e.slowest.sql, "The slowest query should be the one with pg_sleep"
+
+    def test_captured_sql_interpolates_params(self):
+        with explain() as e:
+            list(Student.objects.filter(name="lol"))
+
+        assert "'lol'" in e.queries[0].sql, "Query params should be interpolated into the captured SQL"
+
+    def test_executemany_is_captured(self):
+        with explain() as e:
+            with connection.cursor() as cursor:
+                cursor.executemany(
+                    "INSERT INTO school_student (name) VALUES (%s)",
+                    [("many1",), ("many2",)],
+                )
+            list(Student.objects.filter(name="many1"))
+
+        assert Student.objects.filter(name__startswith="many").count() == 2
+        assert e.n_queries == 2, "Both the executemany and the following query should be captured"
+        assert "%s" in e.queries[0].sql, "Batch queries stay parameterised as mogrify cannot bind a batch"
 
     def test_upload_plan_to_dalibo(self):
         # We can upload results to dalibo
@@ -46,6 +59,7 @@ class TestExplain(TestCase):
         # We can delete the results
         pev_result.delete()
 
+    @tag("browser")
     def test_open_visualization_in_browser(self):
         # We can upload results to dalibo
         with explain() as e:

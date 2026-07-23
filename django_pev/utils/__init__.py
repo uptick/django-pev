@@ -11,6 +11,7 @@ from itertools import groupby
 from threading import local
 from typing import Any
 
+import psycopg
 import sqlglot
 import sqlglot.errors
 import sqlglot.expressions as exp
@@ -35,11 +36,12 @@ CursorWrapper._original_executemany = CursorWrapper._executemany  # type:ignore
 class record_sql:
     """Record the SQL query and parameters for use in the explain view"""
 
-    def __init__(self, cursor_wrapper: CursorWrapper, sql: str, params: Any):
+    def __init__(self, cursor_wrapper: CursorWrapper, sql: str, params: Any, many: bool = False):
         """Record the SQL query and parameters for use in the explain view"""
         self.cursor_wrapper = cursor_wrapper
         self.sql = sql
         self.params = params
+        self.many = many
         self.start_time = time.time()
         self.stack_trace = ""
 
@@ -56,10 +58,23 @@ class record_sql:
         thread_local_query_count.queries = getattr(thread_local_query_count, "queries", []) + [
             {
                 "time": duration,
-                "sql": self.cursor_wrapper.cursor.mogrify(self.sql, self.params).decode("utf-8"),
+                "sql": self._interpolated_sql(),
                 "stack_trace": self.stack_trace,
             }
         ]
+
+    def _interpolated_sql(self) -> str:
+        """Render the query with its parameters interpolated, as it was sent to the server.
+
+        mogrify is run on a fresh ClientCursor rather than the live cursor: mogrify
+        resets the cursor's result state, which breaks Django's row fetching if the
+        query's rows haven't been read yet. executemany passes a batch of parameter
+        sets, which mogrify cannot bind, so batch queries stay parameterised.
+        """
+        if self.many:
+            return self.sql
+        with psycopg.ClientCursor(self.cursor_wrapper.cursor.connection) as client_cursor:
+            return client_cursor.mogrify(self.sql, self.params)
 
 
 def _new_execute(self, sql, params, *ignored_wrapper_args):  # type: ignore[no-untyped-def] # fmt: skip
@@ -68,7 +83,7 @@ def _new_execute(self, sql, params, *ignored_wrapper_args):  # type: ignore[no-u
 
 
 def _new_executemany(self, sql, params, *ignored_wrapper_args):  # type: ignore[no-untyped-def] # fmt: skip
-    with record_sql(sql, params):
+    with record_sql(self, sql, params, many=True):
         return CursorWrapper._original_executemany(self, sql, params, *ignored_wrapper_args)
 
 
