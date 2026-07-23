@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.0.0](https://github.com/uptick/django-pev/compare/django-pev-v1.1.1...django-pev-v2.0.0) (2026-07-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* django-pev now requires psycopg 3 (>=3.1.8) and Django 4.2+. psycopg2 is no longer supported.
+
+### Features
+
+* migrate from psycopg2 to psycopg 3 ([322f052](https://github.com/uptick/django-pev/commit/322f0528137b976b07669d3638cc596b0c7fbef6))
+
+
+### Bug Fixes
+
+* capture executemany queries without crashing ([a420684](https://github.com/uptick/django-pev/commit/a42068435dd07fd57e73821129e060aa1bb12485))
+
 ## [1.1.1](https://github.com/uptick/django-pev/compare/django-pev-v1.1.0...django-pev-v1.1.1) (2026-07-06)
 
 
